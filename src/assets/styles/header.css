@@ -1,0 +1,172 @@
+.app {
+  margin: 0;
+  padding: 0;
+}
+
+.ios-container {
+  height: 490px;
+  background-image: url('../../assets/images/iosbg.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 60px 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ios-wrapper {
+  width: 1200px;
+}
+
+.ios-title {
+  font-size: 46px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: left;
+  color: #ffd630;
+}
+
+.jackpot {
+  position: relative;
+  height: 335px;
+}
+
+.jackpot-bg {
+  width: 1200px;
+  background-image: url('@/assets/images/jackpot.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.types {
+  color: white;
+  font-size: 23px;
+  font-weight: 400;
+}
+
+.main-header,
+.announcement-container {
+  background-color: #363636;
+}
+
+.announcement-container {
+  height: 47px;
+}
+
+.a-text1 {
+  font-size: 13px;
+  color: #fff87d;
+}
+
+.a-text2 {
+  font-size: 12px;
+  min-width: 100%;
+}
+
+.main-header {
+  height: 72px;
+}
+
+.nav {
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100px;
+}
+
+.nav:hover {
+  color: #ffd630;
+}
+
+.login-button,
+.register-button,
+.try-button {
+  font-size: 15px;
+  font-weight: bold;
+  min-width: 140px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  justify-content: center;
+}
+.login-button {
+  background-color: black;
+  color: #ffd630;
+  border: 2px solid #ffd630;
+}
+
+.login-button:hover,
+.try-button {
+  background-color: #484848;
+}
+
+.register-button {
+  background-color: #ffd630;
+  color: black;
+  border: 2px solid #ffd630;
+}
+
+.register-button:hover {
+  background-color: #fff87d;
+  border: 2px solid #fff87d;
+}
+
+.try-button {
+  color: #ffd630;
+  border: 2px solid #484848;
+}
+
+.try-button:hover {
+  background-color: #626262;
+  border: 2px solid #626262;
+}
+
+/* 时间显示样式 */
+.time-display {
+  order: 1;
+  margin-right: auto; /* 将时间模块推到左侧 */
+  margin-left: 2rem; /* 与logo保持距离 */
+}
+
+.time-box {
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  min-width: 180px;
+  justify-content: center;
+}
+
+.time {
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: #fef3c7; /* amber-50 */
+}
+
+.date {
+  color: #d1d5db; /* gray-300 */
+}
+
+.separator {
+  font-weight: bold;
+}
+
+/* 调整按钮间距 */
+.right-section {
+  order: 2;
+  gap: 12px;
+}
+
+.time-display {
+  right: 0;
+}
+
+.datecontainer {
+  margin: 3px;
+}
+.date,
+.time {
+  color: white;
+  font-size: 14px;
+  margin-left: 5px;
+}
