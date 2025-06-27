@@ -1,77 +1,6 @@
-// Slot Game table
-const columns = Array.from({ length: 7 }, (_, index) => ({
-  key: `col-${index}`,
-  dataKey: `col-${index}`,
-  title: `栏目 ${index + 1}`,
-  width: 120,
-  align: 'center',
-}))
-
-// 生成 2 行数据
-const data = Array.from({ length: 2 }, (_, rowIndex) => {
-  const row = {}
-  for (let i = 0; i < 7; i++) {
-    row[`col-${i}`] = `Row ${rowIndex + 1} - Col ${i + 1}`
-  }
-  return row
-})
-
-// 点格子就跳转去 login 页面
-const handleCellClick = () => {
-  router.push('/login')
-}
-
-
-----------------
-
-
 <template>
   <div class="app">
-    <!-- Top Navigation Bar -->
-    <div class="topnav flex flex-col h-20">
-      <div class="datecontainer w-[1200px] h-6 mx-auto relative">
-        <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
-          <span class="date">{{ vietnamDate }}</span>
-          <span class="time">{{ vietnamTime }}</span>
-          <img
-            src="https://flagcdn.com/w40/vn.png"
-            alt="VN"
-            class="w-6 h-4 object-cover rounded-sm ml-2"
-          />
-        </div>
-      </div>
-      <div class="w-[1200px] mx-auto flex justify-between items-center">
-        <div class="logo absolute top-[20px] h-10">
-          <img src="@/assets/images/logo.png" alt="Logo" class="h-full" />
-        </div>
-        <div class="flex justify-end flex-1">
-          <div class="right-section flex items-center gap-1">
-            <button class="login-button">登入</button>
-            <button class="register-button">注册</button>
-            <button class="try-button">注册体验</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="main-header">
-      <div class="w-[1200px] mx-auto p-3">
-        <el-row :gutter="20" justify="center" class="h-auto">
-          <el-col v-for="(item, index) in menuItems" :key="index" :span="2">
-            <div class="nav flex flex-col items-center justify-center gap-1">
-              <img
-                src="@/assets/images/placeholder.png"
-                alt="Logo"
-                class="w-[25px] h-[25px] rounded-full"
-              />
-              <span>{{ item }}</span>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-    </div>
-
+    <HeaderMain />
     <!-- Banner -->
     <div class="banner w-full">
       <el-carousel trigger="click" height="450px">
@@ -82,30 +11,7 @@ const handleCellClick = () => {
     </div>
 
     <!-- Announcement -->
-    <div class="announcement-container w-full">
-      <div class="announcement w-[1200px] mx-auto h-11">
-        <div class="flex items-center h-full">
-          <!-- 固定部分 -->
-          <span class="a-text1 shrink-0 pr-2 h-full flex items-center"> 【喇叭】这是通告： </span>
-
-          <!-- 滚动部分 -->
-          <div class="scrolling-container overflow-hidden flex-1 h-full flex items-center">
-            <div
-              class="a-text2 whitespace-nowrap text-white h-full flex items-center hover:underline"
-              :style="{
-                animation: 'marquee-left 20s linear infinite',
-                animationPlayState: isHovered ? 'paused' : 'running',
-              }"
-              @mouseenter="isHovered = true"
-              @mouseleave="isHovered = false"
-            >
-              -------------------------你的动态通告内容-------------------------
-              -------------------------你的动态通告内容-------------------------
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ABar />
 
     <!-- Types -->
     <div class="types-container flex justify-center h-[230px] pb-15 pt-10">
@@ -194,89 +100,62 @@ const handleCellClick = () => {
     </div>
 
     <!--Slot Games Table -->
-    <div class="slot-game flex-col mb-20">
-      <span class="slot-game-title">爆炸罐子游戏</span>
+    <GameGrid />
 
-      <!-- 🟡 高度必须明确写明 -->
-      <div style="height: 300px; width: 1200px">
-        <el-auto-resizer>
-          <template #default="{ height, width }">
-            <el-table-v2
-              :columns="columns"
-              :data="data"
-              :width="width"
-              :height="height"
-              :row-height="80"
-              class="bg-white text-blue"
-            />
-          </template>
-        </el-auto-resizer>
-      </div>
-    </div>
-
-    <!-- Types -->
-    <div class="types-container flex justify-center h-[230px] pb-15 pt-10">
-      <div class="w-[1200px] flex gap-5">
-        <div v-for="(item, index) in typesItems" :key="index" class="mr-[0px] last:mr-0">
-          <div
-            class="w-[187px] h-[220px] bg-cover bg-center flex flex-col items-center justify-center pb-8 rounded-2xl"
-            :style="{ backgroundImage: `url(${item.bg})` }"
+    <!-- IOS -->
+    <div class="ios-container">
+      <div class="mx-auto w-[1200px] flex">
+        <div class="ios-wrapper flex flex-col mr-auto h-[410px] w-[750px]">
+          <span class="ios-title1">应用下载</span>
+          <span class="ios-title2"
+            >立即为您的手机下载 89bet
+            应用程序以获得更好、更安全的游戏体验，该应用程序支持所有产品：体育、电子竞技、赌场、游戏和彩票。</span
           >
-            <img
-              :src="item.icon"
-              alt="icon"
-              class="w-full h-[210px] mx-auto transition-transform duration-400 cursor-pointer hover:-translate-y-2"
-            />
-            <span class="types text-white mb-[15px]">{{ item.name }}</span>
+          <div class="iosqr flex items-center">
+            <!-- QR1 -->
+            <img src="@/assets/images/iosqr1.png" alt="下载二维码" class="qr-img" />
+
+            <div class="qr-info">
+              <div class="qr-title">
+                <img src="@/assets/images/ios1.png" alt="ios icon" class="w-[31px] h-[38px]" />
+                Android
+              </div>
+              <a href="#" class="qr-btn mr-[50px]"> 立即下载</a>
+            </div>
+            <!-- QR2 -->
+            <img src="@/assets/images/iosqr2.png" alt="下载二维码" class="qr-img" />
+
+            <div class="qr-info">
+              <div class="qr-title">
+                <img src="@/assets/images/ios2.png" alt="ios icon" class="w-[31px] h-[38px]" />
+                IOS
+              </div>
+              <a href="#" class="qr-btn">立即下载</a>
+            </div>
           </div>
         </div>
+        <img
+          src="@/assets/images/iosphone.png"
+          alt="iosphone"
+          class="iosphone w-[343px] h-[410px] bg-contain bg-center"
+        />
       </div>
     </div>
+
+    <!-- Footer -->
+    <FooterMain />
   </div>
 </template>
 
 <script setup>
 import '@/assets/styles/main.css'
-import '@/assets/styles/header.css'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import '@/assets/styles/web.css'
+import HeaderMain from '@/views/HeaderMain.vue'
+import ABar from '@/views/ABar.vue'
+import GameGrid from '@/views/Pages/GameGrid.vue'
+import FooterMain from '../FooterMain.vue'
+import { ref } from 'vue'
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
-import { ElTableV2, ElAutoResizer } from 'element-plus'
-
-onMounted(() => {
-  console.log('Columns:', columns)
-  console.log('Data:', data)
-})
-
-const columns = [
-  { key: 'game', title: '游戏', dataKey: 'game', width: 150 },
-  { key: 'provider', title: '提供商', dataKey: 'provider', width: 120 },
-  { key: 'rtp', title: 'RTP', dataKey: 'rtp', width: 100 },
-  { key: 'volatility', title: '波动性', dataKey: 'volatility', width: 100 },
-  { key: 'features', title: '特点', dataKey: 'features', width: 200 },
-  { key: 'minBet', title: '最小投注', dataKey: 'minBet', width: 100 },
-  { key: 'maxBet', title: '最大投注', dataKey: 'maxBet', width: 100 },
-]
-
-const data = [
-  {
-    game: '爆炸罐子',
-    provider: 'ABC Games',
-    rtp: '96.5%',
-    volatility: '高',
-    features: '免费旋转,奖金游戏',
-    minBet: '1.00',
-    maxBet: '100.00',
-  },
-  {
-    game: '幸运轮盘',
-    provider: 'XYZ Slots',
-    rtp: '95.2%',
-    volatility: '中',
-    features: '累积奖金,乘数',
-    minBet: '0.50',
-    maxBet: '50.00',
-  },
-]
 
 // Jackpot
 const jackpotCarousel = ref()
@@ -321,25 +200,6 @@ const bannerList = [
   new URL('@/assets/images/banner5.jpg', import.meta.url).href,
 ]
 
-const isHovered = ref(false)
-const vietnamTime = ref('')
-const vietnamDate = ref('')
-let timer = null
-const menuItems = [
-  '主页',
-  '爆炸罐',
-  '捕鱼',
-  '赌场',
-  '3D 纸牌游戏',
-  '运动',
-  '抽奖',
-  '鸡踢',
-  '晋升',
-  '应用程序',
-  '代理',
-  '客服服务 24/7',
-]
-
 const typesItems = [
   {
     name: '爆炸罐',
@@ -372,43 +232,6 @@ const typesItems = [
     icon: new URL('@/assets/images/types66.png', import.meta.url).href,
   },
 ]
-
-// 获取越南时间
-const updateVietnamTime = () => {
-  const now = new Date()
-
-  // 越南时区 (UTC+7)
-  const options = {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    hour12: false,
-  }
-
-  // 时间格式: 14:30
-  vietnamTime.value = now.toLocaleTimeString('vi-VN', {
-    ...options,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
-
-  // 新日期格式: yy/mm/dd (T3)
-  const weekdayShort = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][now.getDay()]
-  const year = now.getFullYear().toString().slice(0)
-  const month = (now.getMonth() + 1).toString().padStart(2, '0')
-  const day = now.getDate().toString().padStart(2, '0')
-
-  vietnamDate.value = `${year}/${month}/${day} (${weekdayShort})`
-}
-
-onMounted(() => {
-  updateVietnamTime()
-  // 每秒更新一次
-  timer = setInterval(updateVietnamTime, 1000)
-})
-
-onBeforeUnmount(() => {
-  clearInterval(timer)
-})
 </script>
 
 <style>
@@ -473,14 +296,5 @@ onBeforeUnmount(() => {
 }
 .custom-indicator.active {
   background-color: #ffd630;
-}
-
-@keyframes marquee-left {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
 }
 </style>

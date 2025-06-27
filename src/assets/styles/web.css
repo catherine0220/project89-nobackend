@@ -1,0 +1,92 @@
+/* ios download */
+.iosqr {
+  margin-top: 20px;
+}
+
+.qr-img {
+  width: 142px;
+  height: 142px;
+  margin-right: 20px;
+}
+
+.qr-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.qr-title {
+  font-size: 20px;
+  white-space: nowrap;
+  color: #ffd630;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qr-btn {
+  display: block;
+  width: 160px;
+  height: 29px;
+  line-height: 29px;
+  margin-top: 15px;
+  color: #ffd630;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid #ffd630;
+  border-radius: 14px;
+  background-color: transparent;
+}
+
+.qr-btn:hover {
+  color: black;
+  background-color: #ffd630;
+}
+
+.ios-container {
+  height: 490px;
+  background-image: url('../../assets/images/iosbg.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 60px 0 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.ios-title1 {
+  font-size: 46px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: left;
+  color: #ffd630;
+}
+
+.ios-title2 {
+  font-size: 16px;
+  margin-top: 20px;
+  margin-bottom: 50px;
+  text-align: left;
+  color: white;
+}
+
+/* jackpot */
+.jackpot {
+  position: relative;
+  height: 335px;
+}
+
+.jackpot-bg {
+  width: 1200px;
+  background-image: url('@/assets/images/jackpot.png');
+  background-size: cover;
+  background-position: center;
+}
+
+/* types */
+.types {
+  color: white;
+  font-size: 23px;
+  font-weight: 400;
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="slot-game flex-col mb-20">
+  <div class="slot-game flex-col">
     <span class="slot-game-title">爆炸罐子游戏</span>
 
     <div class="slot-table" :style="bgStyle">
@@ -355,6 +355,7 @@ function goToLogin() {
   align-items: center;
   margin-top: 50px;
   padding-bottom: 20px;
+  height: 688px;
 }
 
 .slot-game-title {
