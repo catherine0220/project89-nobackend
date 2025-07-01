@@ -90,3 +90,444 @@
   font-size: 23px;
   font-weight: 400;
 }
+
+/* 替换默认星号为 Font Awesome 星 */
+.register-modal {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  inset: 0; /* 等同于 top:0; right:0; bottom:0; left:0; */
+  z-index: 50;
+}
+
+.register-modal .fas {
+  color: #f00;
+  margin: 5px;
+}
+
+.register-modal .el-input .el-input__icon {
+  font-weight: bold; /* 加粗（注意有些图标可能不支持） */
+  font-size: 20px; /* 放大 */
+  color: #333;
+}
+
+.register-modal .el-input .el-input__icon:hover {
+  color: #333;
+}
+
+.register-modal .register-img {
+  display: inline-block;
+  margin-right: 10px;
+  width: 22px;
+  height: 26px;
+  vertical-align: middle;
+}
+
+.register-modal .modal-b-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72px;
+  padding: 0 40px;
+  box-sizing: border-box;
+  border-top: 1px solid #000;
+}
+
+.register-modal .modal-b-title {
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+  color: #333;
+}
+
+.register-modal .modal-b-link {
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+  color: #333;
+}
+
+.register-modal .modal-b-link:hover {
+  color: red;
+}
+
+.register-modal .new-button {
+  width: 130px;
+  height: 32px;
+  margin-left: 15px;
+  color: #fff;
+  text-align: center;
+  border: none;
+  border-radius: 16px;
+  background-color: #f81123;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.register-modal .new-button:hover {
+  background-color: #f75b68;
+}
+
+.register-modal .modal-b-title {
+  font-size: 16px;
+}
+
+/* 替换 Element Plus 的红色星号为 Font Awesome 星标 */
+.register-modal .el-form-item.is-required .el-form-item__label::before {
+  content: '\f005'; /* Font Awesome 星标的 Unicode */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900; /* 实心图标需要 900 */
+  color: red;
+  font-size: 8px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.register-modal .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
+  display: none !important;
+}
+
+/* 调整标签对齐 */
+.register-modal .el-form-item__label {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.register-modal .button-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.register-modal .reset-btn {
+  color: #fff;
+  width: 190px;
+  background: #a1a1a1;
+  height: 48px;
+  line-height: 48px;
+  padding: 0;
+  font-size: 24px;
+  border: none;
+  border-radius: 4px;
+}
+
+.register-modal .reset-btn:hover {
+  background: #8a8a8a;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* 调整提交按钮宽度 */
+.register-modal .submit-btn {
+  width: 380px;
+  flex-grow: 1;
+}
+
+.register-modal .submit-btn {
+  background-color: #ffd630;
+  color: #000;
+  height: 48px;
+  line-height: 48px;
+  padding: 0;
+  font-size: 24px;
+  border: none;
+  border-radius: 4px;
+  width: 380px;
+}
+
+.register-modal .submit-btn:hover {
+  color: #333;
+  cursor: pointer;
+  background-color: #ffd630;
+}
+
+.register-modal .agreement {
+  color: #f81123;
+  margin-left: 10px;
+}
+
+.register-modal .agreement:hover,
+.register-modal .agreement:focus {
+  color: #23527c;
+  text-decoration: underline;
+}
+
+.register-modal .el-checkbox__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.register-modal .el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #333;
+}
+
+/* 验证码输入框样式 */
+.register-modal .captcha-input {
+  position: relative;
+  height: 40px !important;
+}
+
+/* 后缀容器样式 */
+.register-modal .captcha-input .el-input__suffix {
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: auto;
+}
+
+/* 验证码图片容器 */
+.register-modal .captcha-code {
+  width: 120px;
+  height: 38px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+/* 确保SVG填满容器 */
+.register-modal .captcha-code svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 调整输入框内边距 */
+.register-modal .captcha-input .el-input__inner {
+  padding-right: 130px !important;
+}
+
+/* 确保后缀内容不会影响输入框宽度 */
+.register-modal .captcha-input .el-input__wrapper {
+  padding-right: 1px !important;
+}
+
+.register-modal .password-strength-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.register-modal .signal-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.register-modal .signal-bar {
+  width: 3px;
+  background-color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.register-modal .signal-bar:nth-child(1) {
+  height: 5px;
+}
+
+.register-modal .signal-bar:nth-child(2) {
+  height: 8px;
+}
+
+.register-modal .signal-bar:nth-child(3) {
+  height: 11px;
+}
+
+.register-modal .signal-bar:nth-child(4) {
+  height: 14px;
+}
+
+.register-modal .signal-bar.active {
+  background-color: #52c41a;
+}
+
+/* 根据密码强度设置不同颜色 */
+.register-modal .password-strength-indicator .signal-bar.active:nth-child(1) {
+  background-color: #ff4d4f;
+}
+
+.register-modal .password-strength-indicator .signal-bar.active:nth-child(2) {
+  background-color: #faad14;
+}
+
+.register-modal .password-strength-indicator .signal-bar.active:nth-child(3) {
+  background-color: #52c41a;
+}
+
+.register-modal .password-strength-indicator .signal-bar.active:nth-child(4) {
+  background-color: #1890ff;
+}
+
+.register-modal .strength-text {
+  font-size: 12px;
+  color: #666;
+  margin-left: 4px;
+}
+
+/* 调整输入框内部布局 */
+.register-modal .el-input__suffix-inner {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+}
+
+.register-modal .error-field .el-input__wrapper {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #a94442 !important;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  transition:
+    border-color ease-in-out 0.15s,
+    box-shadow ease-in-out 0.15s;
+}
+
+/* 焦点状态下的样式 */
+.register-modal .error-field .el-input__wrapper.is-focus {
+  border-color: #ce3a3a !important;
+  box-shadow:
+    0 0 0 2px rgba(255, 0, 0, 0.2),
+    0 0 8px 4px rgba(255, 0, 0, 0.3) !important;
+}
+
+/* 其他字段的错误样式 */
+.register-modal .el-form-item.is-error .el-input__wrapper {
+  border: 1px solid #a94442 !important;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.register-modal .form-item-custom .el-form-item__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  text-align: left;
+  margin: 0px;
+  padding: 0px;
+}
+
+.register-modal .el-form-item {
+  margin-bottom: 20px;
+}
+
+.register-modal .custom-error {
+  position: absolute;
+  bottom: 100%;
+  right: 0px;
+  height: 30px;
+  padding: 0px 10px;
+  color: rgb(255, 255, 255);
+  font-size: 12px;
+  background: rgb(178, 0, 0);
+  line-height: 29px;
+  border-radius: 4px 4px 0px 0px;
+  white-space: nowrap;
+  border-width: 1px 1px 0px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: initial;
+  border-left-style: solid;
+  border-top-color: rgba(255, 255, 255, 0.5);
+  border-right-color: rgba(255, 255, 255, 0.5);
+  border-bottom-color: initial;
+  border-left-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 完全禁用Element UI的默认错误提示 */
+.register-modal .el-form-item__error {
+  display: none !important;
+}
+
+.register-modal .desc {
+  font-size: 14px;
+  color: #333;
+  height: 27px;
+  padding-top: 7px;
+  text-align: left;
+}
+
+.register-modal .modal {
+  position: relative;
+  background-color: #fff;
+  width: 680px;
+  height: 700px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.register-modal .modal-header {
+  position: relative;
+  height: 58px;
+  background-color: #5d5d5d;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-modal .modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 58px;
+  text-align: center;
+}
+
+.register-modal .modal-content {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  padding: 20px 30px;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.register-modal .register {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  inset: 0;
+  z-index: 50;
+}
+
+.register-modal .close-icon {
+  position: absolute !important;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 23px !important;
+  height: 23px !important;
+  background: #ffffff;
+  color: #333 !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center !important;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.register-modal .close-icon:hover {
+  background: #ffd630;
+  color: #000;
+}

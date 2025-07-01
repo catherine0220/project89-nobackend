@@ -19,7 +19,7 @@
       </div>
       <div class="flex justify-end flex-1">
         <div class="right-section flex items-center gap-1">
-          <button class="login-button">登入</button>
+          <button class="login-button" @click="showLogin = true">登入</button>
           <button class="register-button" @click="showRegister = true">注册</button>
           <button class="try-button flex justify-center items-center gap-2">
             <img src="@/assets/images/gameicon.png" alt="game icon" class="w-5 h-5" />注册体验
@@ -29,6 +29,7 @@
     </div>
   </div>
 
+  <LoginModal v-if="showLogin" @close="showLogin = false" />
   <RegisterModal v-if="showRegister" @close="showRegister = false" />
 
   <!-- Navigation -->
@@ -75,9 +76,11 @@
 <script setup>
 import '@/assets/styles/main.css'
 import RegisterModal from '@/views/components/RegisterModal.vue'
+import LoginModal from '@/views/components/LoginModal.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const showRegister = ref(false)
+const showLogin = ref(false)
 
 const vietnamTime = ref('')
 const vietnamDate = ref('')
