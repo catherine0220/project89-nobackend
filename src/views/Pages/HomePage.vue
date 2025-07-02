@@ -36,9 +36,9 @@
     <div class="jackpot flex justify-center items-center">
       <div class="jackpot-bg h-[320px] w-[1200px]">
         <div class="relative z-10 h-full w-full flex">
-          <!-- 左侧内容 -->
+          <!-- 左侧内容 模拟数据（假的）-->
           <div class="w-[580px] h-full flex flex-col justify-center text-white">
-            <p class="text-5xl font-bold mb-6">903,099.05</p>
+            <p class="text-5xl ml-32 mb-0">{{ formattedNumber }}</p>
           </div>
 
           <!-- 右侧轮播图 -->
@@ -152,9 +152,9 @@ import '@/assets/styles/main.css'
 import '@/assets/styles/web.css'
 import HeaderMain from '@/views/HeaderMain.vue'
 import ABar from '@/views/ABar.vue'
-import GameGrid from '@/views/Pages/GameGrid.vue'
+import GameGrid from '@/views/components/GameGrid.vue'
 import FooterMain from '../FooterMain.vue'
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
 
 // Jackpot
@@ -232,6 +232,30 @@ const typesItems = [
     icon: new URL('@/assets/images/types66.png', import.meta.url).href,
   },
 ]
+
+// 模拟会跑的数据 Jackpot
+const number = ref(300000.05)
+let timer = null
+
+// 格式化数字加逗号（903099.05 -> 903,099.05）
+const formattedNumber = computed(() => {
+  return number.value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+})
+
+// 模拟数字增长
+onMounted(() => {
+  timer = setInterval(() => {
+    const increment = Math.random() * 10 // 0~10之间随机增长
+    number.value += increment
+  }, 1500) // 每2秒增长一次
+})
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 </script>
 
 <style>

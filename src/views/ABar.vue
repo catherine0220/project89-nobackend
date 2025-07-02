@@ -3,9 +3,8 @@
   <div class="announcement-container w-full">
     <div class="announcement w-[1200px] mx-auto h-11">
       <div class="flex items-center h-full">
-        <!-- 固定部分 -->
         <span class="a-text1 shrink-0 pr-2 h-full flex items-center">
-          <i class="fa-solid fa-volume"></i> 这是通告：
+          <i class="fa-solid fa-volume-high mr-3"></i> 这是通告：
         </span>
 
         <!-- 滚动部分 -->

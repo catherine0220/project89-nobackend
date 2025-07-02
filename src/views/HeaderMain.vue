@@ -14,15 +14,16 @@
     </div>
 
     <div class="w-[1200px] mx-auto flex justify-between items-center">
-      <div class="logo absolute top-[20px] h-10">
-        <img src="@/assets/images/logo.png" alt="Logo" class="h-full" />
-      </div>
+      <router-link to="/" class="logo absolute top-[20px] h-10">
+        <img src="@/assets/images/logo.png" alt="Logo" class="h-full cursor-pointer" />
+      </router-link>
       <div class="flex justify-end flex-1">
         <div class="right-section flex items-center gap-1">
           <button class="login-button" @click="showLogin = true">登入</button>
           <button class="register-button" @click="showRegister = true">注册</button>
-          <button class="try-button flex justify-center items-center gap-2">
-            <img src="@/assets/images/gameicon.png" alt="game icon" class="w-5 h-5" />注册体验
+          <button class="try-button flex justify-center items-center gap-2" @click="showExp = true">
+            <img src="@/assets/images/gameicon.png" alt="game icon" class="w-5 h-5" />
+            注册体验
           </button>
         </div>
       </div>
@@ -31,6 +32,7 @@
 
   <LoginModal v-if="showLogin" @close="showLogin = false" />
   <RegisterModal v-if="showRegister" @close="showRegister = false" />
+  <ExpModal v-if="showExp" @close="showExp = false" />
 
   <!-- Navigation -->
   <div class="main-header">
@@ -42,14 +44,17 @@
             @mouseenter="handleMouseEnter(index)"
             @mouseleave="handleMouseLeave()"
           >
-            <div class="nav flex flex-col items-center justify-center gap-1">
+            <router-link
+              :to="item.path || '#'"
+              class="nav flex flex-col items-center justify-center gap-1 no-underline"
+            >
               <img
                 src="@/assets/images/placeholder.png"
-                alt="Logo"
+                :alt="item.label"
                 class="w-[25px] h-[25px] rounded-full"
               />
               <span>{{ item.label }}</span>
-            </div>
+            </router-link>
 
             <!-- Dropdown Drawer -->
             <div
@@ -58,13 +63,14 @@
               @mouseenter="activeIndex = index"
               @mouseleave="activeIndex = null"
             >
-              <div
+              <router-link
                 v-for="(child, childIndex) in item.children"
                 :key="childIndex"
-                class="dropdown-item"
+                :to="child.path"
+                class="dropdown-item no-underline"
               >
-                {{ child }}
-              </div>
+                {{ child.label }}
+              </router-link>
             </div>
           </div>
         </el-col>
@@ -77,6 +83,7 @@
 import '@/assets/styles/main.css'
 import RegisterModal from '@/views/components/RegisterModal.vue'
 import LoginModal from '@/views/components/LoginModal.vue'
+import ExpModal from '@/views/components/ExpModal.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const showRegister = ref(false)
@@ -103,46 +110,86 @@ const handleMouseLeave = () => {
 const menuItems = [
   {
     label: '主页',
+    path: '/',
   },
   {
     label: '爆炸罐',
-    children: ['经典模式', '快速模式', '团队模式'],
+    path: '/explosivegame',
+    children: [
+      { label: '经典模式', path: '/bomb/classic' },
+      { label: '快速模式', path: '/bomb/quick' },
+      { label: '团队模式', path: '/bomb/team' },
+    ],
   },
   {
     label: '捕鱼',
-    children: ['深海捕鱼', '黄金渔场', '多人竞技'],
+    children: [
+      { label: '深海捕鱼', path: '/fishing/deepsea' },
+      { label: '黄金渔场', path: '/fishing/golden' },
+      { label: '多人竞技', path: '/fishing/multiplayer' },
+    ],
   },
   {
     label: '赌场',
-    children: ['百家乐', '轮盘', '二十一点', '德州扑克'],
+    path: '/bet',
+    children: [
+      { label: '百家乐', path: '/casino/baccarat' },
+      { label: '轮盘', path: '/casino/roulette' },
+      { label: '二十一点', path: '/casino/blackjack' },
+      { label: '德州扑克', path: '/casino/poker' },
+    ],
   },
   {
     label: '3D 纸牌游戏',
-    children: ['3D 扑克', '3D 麻将', '3D 老虎机'],
+    children: [
+      { label: '3D 扑克', path: '/cards/poker' },
+      { label: '3D 麻将', path: '/cards/mahjong' },
+      { label: '3D 老虎机', path: '/cards/slot' },
+    ],
   },
   {
     label: '运动',
-    children: ['足球', '篮球', '网球', '赛马'],
+    path: '/sports',
+    children: [
+      { label: '足球', path: '/sports/football' },
+      { label: '篮球', path: '/sports/basketball' },
+      { label: '网球', path: '/sports/tennis' },
+      { label: '赛马', path: '/sports/horse' },
+    ],
   },
   {
     label: '抽奖',
-    children: ['每日抽奖', '幸运大转盘', 'VIP专属'],
+    path: '/lottery',
+    children: [
+      { label: '每日抽奖', path: '/lottery/daily' },
+      { label: '幸运大转盘', path: '/lottery/wheel' },
+      { label: 'VIP专属', path: '/lottery/vip' },
+    ],
   },
   {
     label: '鸡踢',
-    children: ['GT赛车', 'GT竞猜', 'GT排行榜'],
+    path: '/cockfighting',
+    children: [
+      { label: 'GT赛车', path: '/gt/race' },
+      { label: 'GT竞猜', path: '/gt/bet' },
+      { label: 'GT排行榜', path: '/gt/rank' },
+    ],
   },
   {
     label: '晋升',
+    path: '/promotion',
   },
   {
     label: '应用程序',
+    path: '/app',
   },
   {
     label: '代理',
+    path: '/agent',
   },
   {
     label: '客服服务 24/7',
+    path: '/support',
   },
 ]
 
@@ -310,10 +357,11 @@ onBeforeUnmount(() => {
   min-height: 150px;
   margin-top: 10px;
   border: 1px solid #ffd630;
+  display: flex;
+  flex-direction: column;
 }
 
 .dropdown-item {
-  transition: all 0.2s ease;
   color: white;
   font-size: 12px;
   cursor: pointer;

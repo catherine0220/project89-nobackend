@@ -5,34 +5,34 @@
 
     <!-- Banner -->
     <div class="flex justify-center">
-      <img src="@/assets/images/sportsbanner.jpg" alt="banner" class="banner" />
+      <img src="@/assets/images/cockfightingbanner.jpg" alt="banner" class="banner" />
     </div>
 
     <!-- Announcement -->
     <ABar />
-    <div class="sportspage-container">
-      <div class="sportspage-wrapper">
+    <div class="cockfighting-container">
+      <div class="cockfighting-wrapper">
         <el-row :gutter="20">
-          <el-col :span="8" v-for="(img, index) in 3" :key="index" class="image-box">
+          <el-col :span="8" v-for="(img, index) in 1" :key="index" class="image-box">
             <div class="image-wrapper">
-              <p class="intro">足球</p>
-              <img src="@/assets/images/sports1.png" class="sportspage-img" />
+              <p class="intro">AOG 鸡踢</p>
+              <img src="@/assets/images/cockfighting1.png" class="cockfighting-img" />
               <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
             </div>
           </el-col>
 
-          <el-col :span="8" v-for="(img, index) in 3" :key="index" class="image-box">
+          <el-col :span="8" v-for="(img, index) in 1" :key="index" class="image-box">
             <div class="image-wrapper">
-              <p class="intro">足球</p>
-              <img src="@/assets/images/sports1.png" class="sportspage-img" />
+              <p class="intro">AOG 鸡踢</p>
+              <img src="@/assets/images/cockfighting1.png" class="cockfighting-img" />
               <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
             </div>
           </el-col>
 
-          <el-col :span="8" v-for="(img, index) in 3" :key="index" class="image-box">
+          <el-col :span="8" v-for="(img, index) in 1" :key="index" class="image-box">
             <div class="image-wrapper">
-              <p class="intro">足球</p>
-              <img src="@/assets/images/sports1.png" class="sportspage-img" />
+              <p class="intro">AOG 鸡踢</p>
+              <img src="@/assets/images/cockfighting1.png" class="cockfighting-img" />
               <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
             </div>
           </el-col>
@@ -60,17 +60,7 @@ import FooterMain from '../FooterMain.vue'
 </script>
 
 <style scoped>
-.intro {
-  position: absolute;
-  left: 27px;
-  bottom: 88px;
-  margin: 0;
-  color: #fff;
-  font-size: 18px;
-  z-index: 1;
-}
-
-.sportspage-container {
+.cockfighting-container {
   position: relative;
   padding: 30px 0;
   display: flex;
@@ -78,12 +68,12 @@ import FooterMain from '../FooterMain.vue'
   align-items: center;
 }
 
-.sportspage-wrapper {
+.cockfighting-wrapper {
   position: relative;
   width: 1200px;
 }
 
-.sportspage.img {
+.cockfighting.img {
   position: relative;
   width: 390px;
   height: 250px;
@@ -104,7 +94,7 @@ import FooterMain from '../FooterMain.vue'
   margin-bottom: 25px;
 }
 
-.sportspage-img {
+.cockfighting-img {
   width: 100%;
   border-radius: 10px;
   display: block;
@@ -134,5 +124,15 @@ import FooterMain from '../FooterMain.vue'
   background-color: #ffd630;
   color: black;
   border: solid 1px #ffd630;
+}
+
+.intro {
+  position: absolute;
+  left: 27px;
+  bottom: 88px;
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  z-index: 1;
 }
 </style>

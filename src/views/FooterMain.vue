@@ -90,7 +90,7 @@
 import { ref } from 'vue'
 
 const quickLinks1 = ref([
-  { path: '/about', text: '关于我们' },
+  { path: '/aboutus', text: '关于我们' },
   { path: '/agents', text: '代理' },
   { path: '/deposit', text: '存款说明' },
   { path: '/withdrawal', text: '提款指示' },
@@ -99,13 +99,13 @@ const quickLinks1 = ref([
 ])
 
 const quickLinks2 = ref([
-  { path: '/casinogame', text: '赌场' },
+  { path: '/bet', text: '赌场' },
   { path: '/explosivegame', text: '爆炸罐' },
   { path: '/deposit', text: '捕鱼' },
-  { path: '/withdrawal', text: '运动' },
+  { path: '/sports', text: '运动' },
   { path: '/contact', text: '3D纸牌游戏' },
-  { path: '/app', text: '鸡踢' },
-  { path: '/app', text: '抽奖' },
+  { path: '/cockfighting', text: '鸡踢' },
+  { path: '/lottery', text: '抽奖' },
 ])
 </script>
 
