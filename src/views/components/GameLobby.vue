@@ -49,7 +49,7 @@
         </h1>
 
         <div class="game-carousel-container">
-          <div class="carousel-wrapper">
+          <div class="carousel-wrapper" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
             <button class="carousel-arrow left" @click="prevSlide">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
@@ -66,7 +66,11 @@
                 >
                   <div class="game-card">
                     <div class="game-header">
-                      <img src="@/assets/images/gamelobby.gif" alt="gamelogo" class="gamelogo" />
+                      <div class="logo-container">
+                        <img src="@/assets/images/gamelobby.gif" alt="gamelogo" class="gamelogo" />
+                        <div class="logo-overlay"></div>
+                        <button class="play-button">PLAY</button>
+                      </div>
                       <div class="game-title-container">
                         <h3 class="game-title">{{ game.name }}</h3>
                         <i class="heart-icon fa-regular fa-heart"></i>
@@ -104,15 +108,52 @@
 
         <div class="game-grid-container">
           <div class="game-grid">
-            <div v-for="(game, gameIndex) in hotGames" :key="gameIndex" class="game-card2">
+            <div v-for="(game, gameIndex) in visibleHotGames" :key="gameIndex" class="game-card2">
               <div class="game-header">
-                <img src="@/assets/images/gamelobby1.png" alt="gamelogo" class="gamelogo2" />
+                <div class="logo-container">
+                  <img src="@/assets/images/gamelobby1.png" alt="gamelogo" class="gamelogo2" />
+                  <div class="logo-overlay"></div>
+                  <button class="play-button">PLAY</button>
+                </div>
                 <div class="game-title-container">
                   <h3 class="game-title2">{{ game.name }}</h3>
                   <i class="heart-icon fa-regular fa-heart"></i>
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Custom pagination controls -->
+          <div class="hot-games-pagination">
+            <button
+              class="pagination-btn first"
+              @click="goToFirstPage"
+              :disabled="currentHotPage === 1"
+            >
+              <i class="fa-solid fa-backward-step"></i>
+            </button>
+            <button
+              class="pagination-btn prev"
+              @click="prevHotPage"
+              :disabled="currentHotPage === 1"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="page-indicator">{{ currentHotPage }}/{{ totalHotPages }}</div>
+            <button
+              class="pagination-btn next"
+              @click="nextHotPage"
+              :disabled="currentHotPage === totalHotPages"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button
+              class="pagination-btn last"
+              @click="goToLastPage"
+              :disabled="currentHotPage === totalHotPages"
+            >
+              <i class="fa-solid fa-forward-step"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -121,30 +162,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { CaretRight } from '@element-plus/icons-vue'
 import placeholderImage from '@/assets/images/placeholder.png'
 
 // 静态导入所有游戏图片
 import pcImage from '@/assets/images/placeholder.png'
 import jiliImage from '@/assets/images/placeholder.png'
-// 导入其他游戏图片...
 
-const electronicGames = [
-  'PC 电子',
-  '吉利电子',
-  'FG 电子',
-  'PC 电子',
-  '吉利电子',
-  'FG 电子',
-  // ...其他游戏名称
-]
+const electronicGames = ['PC 电子', '吉利电子', 'FG 电子', 'PC 电子', '吉利电子', 'FG 电子']
 
 // 游戏图片映射
 const gameImages = {
   'PC 电子': pcImage,
   吉利电子: jiliImage,
-  // ...其他游戏图片映射
 }
 
 // nav
@@ -161,8 +192,6 @@ const activeCategory = ref(1)
 // 方法
 const selectCategory = (id) => {
   activeCategory.value = id
-  // 可以在这里触发获取对应分类的游戏列表
-  // emit('category-change', id)
 }
 
 // Game data
@@ -233,65 +262,110 @@ const games = ref([
 const hotGames = ref([
   {
     name: 'Hot Game 1',
-    // code: 'HOT1',
     description: 'Popular game 1',
     tags: ['HOT', 'NEW'],
   },
   {
     name: 'Hot Game 2',
-    // code: 'HOT2',
     description: 'Popular game 2',
     tags: ['HOT', 'TRENDING'],
   },
   {
     name: 'Hot Game 3',
-    // code: 'HOT3',
     description: 'Popular game 3',
     tags: ['HOT', 'FEATURED'],
   },
   {
     name: 'Hot Game 4',
-    // code: 'HOT4',
     description: 'Popular game 4',
     tags: ['HOT', 'NEW'],
   },
   {
     name: 'Hot Game 5',
-    // code: 'HOT5',
     description: 'Popular game 5',
     tags: ['HOT', 'TRENDING'],
   },
   {
     name: 'Hot Game 6',
-    // code: 'HOT6',
     description: 'Popular game 6',
     tags: ['HOT', 'FEATURED'],
   },
   {
     name: 'Hot Game 7',
-    // code: 'HOT7',
     description: 'Popular game 7',
     tags: ['HOT', 'NEW'],
   },
   {
     name: 'Hot Game 8',
-    // code: 'HOT8',
     description: 'Popular game 8',
     tags: ['HOT', 'TRENDING'],
   },
   {
     name: 'Hot Game 9',
-    // code: 'HOT9',
     description: 'Popular game 9',
     tags: ['HOT', 'FEATURED'],
   },
   {
     name: 'Hot Game 10',
-    // code: 'HOT10',
     description: 'Popular game 10',
     tags: ['HOT', 'NEW'],
   },
+  {
+    name: 'Hot Game 11',
+    description: 'Popular game 11',
+    tags: ['HOT', 'TRENDING'],
+  },
+  {
+    name: 'Hot Game 12',
+    description: 'Popular game 12',
+    tags: ['HOT', 'FEATURED'],
+  },
+  {
+    name: 'Hot Game 13',
+    description: 'Popular game 13',
+    tags: ['HOT', 'NEW'],
+  },
+  {
+    name: 'Hot Game 14',
+    description: 'Popular game 14',
+    tags: ['HOT', 'TRENDING'],
+  },
+  {
+    name: 'Hot Game 15',
+    description: 'Popular game 15',
+    tags: ['HOT', 'FEATURED'],
+  },
 ])
+
+// Hot games pagination
+const currentHotPage = ref(1)
+const gamesPerPage = 10
+const totalHotPages = computed(() => Math.ceil(hotGames.value.length / gamesPerPage))
+const visibleHotGames = computed(() => {
+  const start = (currentHotPage.value - 1) * gamesPerPage
+  const end = start + gamesPerPage
+  return hotGames.value.slice(start, end)
+})
+
+const nextHotPage = () => {
+  if (currentHotPage.value < totalHotPages.value) {
+    currentHotPage.value++
+  }
+}
+
+const prevHotPage = () => {
+  if (currentHotPage.value > 1) {
+    currentHotPage.value--
+  }
+}
+
+const goToFirstPage = () => {
+  currentHotPage.value = 1
+}
+
+const goToLastPage = () => {
+  currentHotPage.value = totalHotPages.value
+}
 
 // Carousel logic for 游戏介绍
 const gameGroups = ref([])
@@ -464,6 +538,73 @@ onUnmounted(() => {
   width: 150px !important;
 }
 
+.game-card:hover,
+.game-card2:hover {
+  color: #fff;
+  background-color: #ff1c4f;
+}
+
+/* Logo容器样式 */
+.logo-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Logo图片样式 */
+.gamelogo,
+.gamelogo2 {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 5px;
+}
+
+/* Logo遮罩层 */
+.logo-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  align-items: center;
+}
+
+/* Play按钮样式 */
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 30px;
+  width: 100px;
+  transform: translate(-50%, -50%);
+  background-color: #ff1c4f;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+/* 悬停效果 */
+.game-card:hover .logo-overlay,
+.game-card2:hover .logo-overlay {
+  opacity: 1;
+}
+
+.game-card:hover .play-button,
+.game-card2:hover .play-button {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
 .game-header {
   display: flex;
   flex-direction: column;
@@ -519,26 +660,6 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
-.play-button {
-  background: #ffd630;
-  color: #000;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 12px;
-  cursor: pointer;
-  margin-top: auto;
-  align-self: center;
-  transition: all 0.3s;
-  width: 100%;
-}
-
-.play-button:hover {
-  background: #ffea8a;
-  transform: translateY(-2px);
-}
-
 /* 轮播箭头样式 */
 .carousel-arrow {
   position: absolute;
@@ -592,6 +713,55 @@ onUnmounted(() => {
   background: #000;
 }
 
+/* Hot games pagination styles */
+.hot-games-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 5px;
+}
+
+.pagination-btn {
+  width: 40px;
+  height: 30px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #ff1c4f;
+}
+
+.page-indicator {
+  width: 60px;
+  height: 30px;
+  background: #000;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Specific button styles */
+.pagination-btn.first {
+  border-radius: 5px 0 0 5px;
+}
+
+.pagination-btn.last {
+  border-radius: 0 5px 5px 0;
+}
+
 /* search */
 .search-icon {
   color: white;
@@ -614,7 +784,7 @@ onUnmounted(() => {
   width: 150px;
   height: 100%;
   font-size: 14px;
-  color: #fff;
+  color: #000;
   background: #fff;
   border: none;
   outline: none;
@@ -643,7 +813,7 @@ onUnmounted(() => {
 .lobby-wrapper2 {
   position: relative;
   width: 1200px;
-  min-height: 480px;
+  min-height: 80px;
   padding: 30px;
   margin-bottom: 0;
 }

@@ -123,6 +123,7 @@ const menuItems = [
   },
   {
     label: '捕鱼',
+    path: '/fishing',
     children: [
       { label: '深海捕鱼', path: '/fishing/deepsea' },
       { label: '黄金渔场', path: '/fishing/golden' },
@@ -141,6 +142,7 @@ const menuItems = [
   },
   {
     label: '3D 纸牌游戏',
+    path: '/board',
     children: [
       { label: '3D 扑克', path: '/cards/poker' },
       { label: '3D 麻将', path: '/cards/mahjong' },
@@ -177,15 +179,15 @@ const menuItems = [
   },
   {
     label: '晋升',
-    path: '/promotion',
+    path: '/promotions',
   },
   {
     label: '应用程序',
-    path: '/app',
+    path: '/downloadapp',
   },
   {
     label: '代理',
-    path: '/agent',
+    path: '/agents',
   },
   {
     label: '客服服务 24/7',

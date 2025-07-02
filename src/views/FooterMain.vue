@@ -95,15 +95,15 @@ const quickLinks1 = ref([
   { path: '/deposit', text: '存款说明' },
   { path: '/withdrawal', text: '提款指示' },
   { path: '/contact', text: '联系我们' },
-  { path: '/app', text: '移动应用程序' },
+  { path: '/downloadapp', text: '移动应用程序' },
 ])
 
 const quickLinks2 = ref([
   { path: '/bet', text: '赌场' },
   { path: '/explosivegame', text: '爆炸罐' },
-  { path: '/deposit', text: '捕鱼' },
+  { path: '/fishing', text: '捕鱼' },
   { path: '/sports', text: '运动' },
-  { path: '/contact', text: '3D纸牌游戏' },
+  { path: '/board', text: '3D纸牌游戏' },
   { path: '/cockfighting', text: '鸡踢' },
   { path: '/lottery', text: '抽奖' },
 ])

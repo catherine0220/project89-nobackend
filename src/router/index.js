@@ -9,11 +9,13 @@ import AgentsPage from '@/views/InfoPages/AgentsPage.vue'
 import DepositPage from '@/views/InfoPages/DepositPage.vue'
 import WithdrawalPage from '@/views/InfoPages/WithdrawalPage.vue'
 import ContactPage from '@/views/InfoPages/ContactPage.vue'
-import AppPage from '@/views/InfoPages/AppPage.vue'
+import DownloadApp from '@/views/InfoPages/DownloadApp.vue'
 import LotteryPage from '@/views/Pages/LotteryPage.vue'
 import ExplosiveGame from '@/views/Pages/ExplosiveGame.vue'
 import BetPage from '@/views/Pages/BetPage.vue'
 import CockFighting from '@/views/Pages/CockFighting.vue'
+import FishingPage from '@/views/Pages/FishingPage.vue'
+import BoardPage from '@/views/Pages/BoardPage.vue'
 
 const routes = [
   {
@@ -71,9 +73,9 @@ const routes = [
     meta: { title: '联系我们' },
   },
   {
-    path: '/app',
-    name: 'App',
-    component: AppPage,
+    path: '/downloadapp',
+    name: 'downloadapp',
+    component: DownloadApp,
     meta: { title: 'APP下载' },
   },
   {
@@ -99,6 +101,18 @@ const routes = [
     name: 'CockFighting',
     component: CockFighting,
     meta: { title: '鸡踢' },
+  },
+  {
+    path: '/fishing',
+    name: 'FishingPage',
+    component: FishingPage,
+    meta: { title: '捕鱼' },
+  },
+  {
+    path: '/board',
+    name: 'BoardPage',
+    component: BoardPage,
+    meta: { title: '3D 纸牌游戏' },
   },
   // 404页面处理
   {
