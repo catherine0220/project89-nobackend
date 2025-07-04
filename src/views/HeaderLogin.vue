@@ -1,55 +1,59 @@
 <template>
   <!-- Top Login Bar -->
-  <div class="topnav flex flex-col h-20">
-    <div class="datecontainer w-[1200px] h-6 mx-auto relative">
-      <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
-        <span class="date">{{ vietnamDate }}</span>
-        <span class="time">{{ vietnamTime }}</span>
+  <div class="login-header-container flex flex-col h-20 items-center">
+    <div class="login-date-container w-[1200px] h-6 mx-auto relative">
+      <div class="login-time-display absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
+        <span class="login-date">{{ vietnamDate }}</span>
+        <span class="login-time">{{ vietnamTime }}</span>
         <img
           src="https://flagcdn.com/w40/vn.png"
           alt="VN"
-          class="w-6 h-4 object-cover rounded-sm ml-2"
+          class="login-flag-icon w-6 h-4 object-cover rounded-sm ml-2"
         />
       </div>
     </div>
 
-    <div class="w-[1200px] mx-auto flex justify-between items-center">
-      <router-link to="/" class="logo absolute top-[20px] h-10">
+    <div class="login-header-content w-[1200px] mx-auto flex justify-between items-center">
+      <router-link to="/" class="login-logo absolute top-[20px] h-10">
         <img src="@/assets/images/logo.png" alt="Logo" class="h-full cursor-pointer" />
       </router-link>
-      <div class="flex justify-end flex-1">
-        <div class="right-section flex items-center gap-1">
-          <div class="id-name">
-            <div class="id-title">账户:</div>
-            <div class="id-title2">ID Name</div>
+      <div class="login-header-right flex justify-end flex-1">
+        <div class="login-user-section flex items-center gap-1">
+          <div class="login-user-info">
+            <div class="login-info-label">账户:</div>
+            <div class="login-info-value">ID Name</div>
             <i class="fa fa-solid fa-message"></i>
           </div>
-          <div class="id-name">
-            <div class="id-title">剩余:</div>
-            <div class="id-title2">0</div>
-            <i class="fa-solid fa-arrows-rotate text-yellow-300"></i>
+          <div class="login-user-info">
+            <div class="login-info-label">剩余:</div>
+            <div class="login-info-value">0</div>
+            <i class="fa-solid fa-arrows-rotate"></i>
           </div>
-          <button class="id-name2">网上存款</button>
-          <button class="id-name2">在线提现</button>
+          <button class="login-action-button">网上存款</button>
+          <button class="login-action-button">在线提现</button>
           <el-dropdown
             placement="bottom-end"
-            popper-class="custom-dropdown"
+            popper-class="login-user-dropdown"
             trigger="click"
             @visible-change="(val) => (dropdownVisible = val)"
           >
-            <el-button class="custom-dropdown-btn">
-              <el-icon class="gold-icon rotate-icon" :class="{ open: dropdownVisible }">
+            <el-button class="login-dropdown-button">
+              <el-icon class="login-dropdown-icon rotate-icon" :class="{ open: dropdownVisible }">
                 <ArrowDownBold />
               </el-icon>
             </el-button>
 
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>投注历史</el-dropdown-item>
-                <el-dropdown-item>交易详情</el-dropdown-item>
-                <el-dropdown-item>更改您的提款密码</el-dropdown-item>
-                <el-dropdown-item>会员中心</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/home')">投注历史</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/home')">交易详情</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/home')">更改您的提款密码</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/membercenter')">会员中心</el-dropdown-item>
               </el-dropdown-menu>
+              <div class="login-logout-button ml-[20px] mb-[10px]" @click="handleLogout">
+                <i class="fa-solid fa-door-open"> </i>
+                <span class="text-white text-[14px]">登出</span>
+              </div>
             </template>
           </el-dropdown>
         </div>
@@ -58,23 +62,23 @@
   </div>
 
   <!-- Navigation -->
-  <div class="main-header">
-    <div class="w-[1200px] mx-auto p-3">
+  <div class="login-main-navigation">
+    <div class="login-nav-container w-[1200px] mx-auto p-3">
       <el-row :gutter="20" justify="center" class="h-auto">
         <el-col v-for="(item, index) in menuItems" :key="index" :span="2">
           <div
-            class="nav-container relative"
+            class="login-nav-item relative"
             @mouseenter="handleMouseEnter(index)"
             @mouseleave="handleMouseLeave()"
           >
             <router-link
               :to="item.path || '#'"
-              class="nav flex flex-col items-center justify-center gap-1 no-underline"
+              class="login-nav-link flex flex-col items-center justify-center gap-1 no-underline"
             >
               <img
                 src="@/assets/images/placeholder.png"
                 :alt="item.label"
-                class="w-[25px] h-[25px] rounded-full"
+                class="login-nav-icon w-[25px] h-[25px] rounded-full"
               />
               <span>{{ item.label }}</span>
             </router-link>
@@ -82,7 +86,7 @@
             <!-- Dropdown Drawer -->
             <div
               v-if="activeIndex === index && item.children"
-              class="dropdown-drawer"
+              class="login-nav-dropdown"
               @mouseenter="activeIndex = index"
               @mouseleave="activeIndex = null"
             >
@@ -90,7 +94,7 @@
                 v-for="(child, childIndex) in item.children"
                 :key="childIndex"
                 :to="child.path"
-                class="dropdown-item no-underline"
+                class="login-dropdown-link no-underline"
               >
                 {{ child.label }}
               </router-link>
@@ -106,6 +110,18 @@
 import '@/assets/styles/main.css'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { ArrowDownBold } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goTo = (path) => {
+  router.push(path)
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  router.push('/')
+}
 
 const dropdownVisible = ref(false)
 
@@ -116,12 +132,11 @@ let timer = null
 let closeTimer = null
 
 const handleMouseEnter = (index) => {
-  clearTimeout(closeTimer) // 清除之前的关闭计时器
+  clearTimeout(closeTimer)
   activeIndex.value = index
 }
 
 const handleMouseLeave = () => {
-  // 设置延迟关闭（例如 300ms）
   closeTimer = setTimeout(() => {
     activeIndex.value = null
   }, 300)
@@ -215,17 +230,14 @@ const menuItems = [
   },
 ]
 
-// 获取越南时间
 const updateVietnamTime = () => {
   const now = new Date()
 
-  // 越南时区 (UTC+7)
   const options = {
     timeZone: 'Asia/Ho_Chi_Minh',
     hour12: false,
   }
 
-  // 时间格式: 14:30
   vietnamTime.value = now.toLocaleTimeString('vi-VN', {
     ...options,
     hour: '2-digit',
@@ -233,7 +245,6 @@ const updateVietnamTime = () => {
     second: '2-digit',
   })
 
-  // 新日期格式: yy/mm/dd (T3)
   const weekdayShort = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][now.getDay()]
   const year = now.getFullYear().toString().slice(0)
   const month = (now.getMonth() + 1).toString().padStart(2, '0')
@@ -244,7 +255,6 @@ const updateVietnamTime = () => {
 
 onMounted(() => {
   updateVietnamTime()
-  // 每秒更新一次
   timer = setInterval(updateVietnamTime, 1000)
 })
 
@@ -254,11 +264,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-.custom-dropdown .el-popper__arrow {
+.login-header-container {
+  background-color: #1e1e1e;
+}
+
+.login-user-dropdown .el-popper__arrow {
   display: none !important;
 }
 
-.custom-dropdown {
+.login-user-dropdown {
   position: absolute;
   width: 180px !important;
   height: auto !important;
@@ -268,26 +282,25 @@ onBeforeUnmount(() => {
   border-radius: 6px !important;
   background-color: rgba(0, 0, 0, 0.85) !important;
   margin-top: 0 !important;
-  /* Add these to ensure proper positioning without arrow */
   transform: none !important;
 }
 
-.custom-dropdown .el-dropdown-menu {
+.login-user-dropdown .el-dropdown-menu {
   background-color: transparent !important;
   border: none !important;
-  padding: 0 !important;
+  padding-top: 5px !important;
 }
 
-.custom-dropdown .el-dropdown-menu__item {
+.login-user-dropdown .el-dropdown-menu__item {
   position: relative;
   padding-left: 40px !important;
   font-size: 12px;
   color: white !important;
   background-color: transparent !important;
+  margin-bottom: 5px;
 }
 
-/* 黑点初始样式 */
-.custom-dropdown .el-dropdown-menu__item::before {
+.login-user-dropdown .el-dropdown-menu__item::before {
   content: '•';
   position: absolute;
   left: 8px;
@@ -297,13 +310,11 @@ onBeforeUnmount(() => {
   color: white;
 }
 
-/* Hover 效果：整条 item 背景变色 + 字变黄 + 黑点变黄 */
-.custom-dropdown .el-dropdown-menu__item:hover {
+.login-user-dropdown .el-dropdown-menu__item:hover {
   color: #ffd630 !important;
 }
 
-/* 同时黑点也变黄 */
-.custom-dropdown .el-dropdown-menu__item:hover::before {
+.login-user-dropdown .el-dropdown-menu__item:hover::before {
   color: #ffd630;
 }
 
@@ -315,7 +326,7 @@ onBeforeUnmount(() => {
   transform: rotate(180deg);
 }
 
-.custom-dropdown-btn {
+.login-dropdown-button {
   width: 36px !important;
   height: 36px !important;
   border: none !important;
@@ -325,29 +336,22 @@ onBeforeUnmount(() => {
   margin-left: 10px;
 }
 
-.gold-icon svg {
+.login-dropdown-icon svg {
   color: #ffd630 !important;
   width: 30px;
   height: 30px;
 }
 
-.fa-solid,
-.fas {
-  color: rgb(117, 233, 119);
-  padding: 5px 10px;
-  padding-left: 0px;
-}
-
-.id-name,
-.id-title,
-.id-title2 {
+.login-user-info,
+.login-info-label,
+.login-info-value {
   line-height: 26px;
   font-size: 14px;
   color: #fff;
   border-radius: 5px;
 }
 
-.id-name {
+.login-user-info {
   margin-left: 10px;
   background: #484848;
   display: flex;
@@ -355,22 +359,22 @@ onBeforeUnmount(() => {
   justify-items: center;
 }
 
-.id-title,
-.id-title2 {
+.login-info-label,
+.login-info-value {
   padding: 5px 10px;
 }
 
-.id-title {
+.login-info-label {
   display: inline-block;
   border-radius: 5px 0 0 5px;
   background: #363636;
 }
 
-.id-title2 {
+.login-info-value {
   color: #fff48e;
 }
 
-.id-name2 {
+.login-action-button {
   display: flex;
   align-items: center;
   justify-items: center;
@@ -385,28 +389,13 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
-/* 时间显示样式 */
-.time-display {
-  order: 1;
-  margin-right: auto;
-  margin-left: 2rem;
-}
-
-.time-box {
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  min-width: 180px;
-  justify-content: center;
-}
-
-.time {
+.login-time {
   font-size: 15px;
   letter-spacing: 0.5px;
   color: #fef3c7;
 }
 
-.date {
+.login-date {
   color: #d1d5db;
 }
 
@@ -414,31 +403,30 @@ onBeforeUnmount(() => {
   font-weight: bold;
 }
 
-.right-section {
+.login-user-section {
   order: 2;
   gap: 12px;
-  width: 590px;
 }
 
-.time-display {
+.login-time-display {
   right: 0;
 }
 
-.datecontainer {
+.login-date-container {
   margin: 3px;
 }
-.date,
-.time {
+.login-date,
+.login-time {
   color: white;
   font-size: 14px;
   margin-left: 5px;
 }
 
-.main-header {
+.login-main-navigation {
   height: 72px;
 }
 
-.nav {
+.login-nav-link {
   color: white;
   font-size: 13px;
   font-weight: bold;
@@ -446,17 +434,16 @@ onBeforeUnmount(() => {
   width: 100px;
 }
 
-.nav-container:hover .nav,
-.nav-container[data-active='true'] .nav {
+.login-nav-item:hover .login-nav-link,
+.login-nav-item[data-active='true'] .login-nav-link {
   color: #ffd630;
 }
 
-/* Dropdown styles */
-.nav-container {
+.login-nav-item {
   height: 100%;
 }
 
-.dropdown-drawer {
+.login-nav-dropdown {
   position: absolute;
   top: 100%;
   left: 0;
@@ -472,14 +459,31 @@ onBeforeUnmount(() => {
   flex-direction: column;
 }
 
-.dropdown-item {
+.login-dropdown-link {
   color: white;
   font-size: 12px;
   cursor: pointer;
   padding: 10px;
 }
 
-.dropdown-item:hover {
+.login-dropdown-link:hover {
   color: #ffd630;
+}
+
+.fa-message {
+  color: rgb(117, 233, 119);
+  padding: 5px 10px;
+  padding-left: 0px;
+}
+
+.fa-arrows-rotate {
+  @apply text-yellow-300;
+  padding: 5px 10px;
+  padding-left: 0px;
+}
+
+.fa-door-open {
+  color: white;
+  font-size: 15px;
 }
 </style>

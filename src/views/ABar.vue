@@ -44,9 +44,10 @@ const isHovered = ref(false)
   height: 47px;
 }
 
-.a-text1 {
+.a-text1,
+.fa-volume-high {
   font-size: 13px;
-  color: #fff87d;
+  color: #fff87d !important;
 }
 
 .a-text2 {

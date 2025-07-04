@@ -1,4 +1,5 @@
 <template>
+  <!-- 其实这个页面不存在，这个只是充数而已 -->
   <div class="registration-container">
     <h2>账户注册</h2>
 

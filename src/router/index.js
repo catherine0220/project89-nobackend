@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/Pages/HomePage.vue'
 import SportsPage from '@/views/Pages/SportsPage.vue'
 import PromotionsPage from '@/views/Pages/PromotionsPage.vue'
-import LoginPage from '@/views/Pages/LoginPage.vue'
 
 import AboutUs from '@/views/InfoPages/AboutUs.vue'
 import AgentsPage from '@/views/InfoPages/AgentsPage.vue'
@@ -22,7 +21,8 @@ import CommissionView from '@/views/components/CommissionView.vue'
 import RegistrationView from '@/views/components/RegistrationView.vue'
 import ReportView from '@/views/components/ReportView.vue'
 
-import LoginHome from '@/views/LoginPages/LoginHome.vue'
+import LoginHome from '@/views/Pages/LoginHome.vue'
+import MemberCenter from '@/views/Pages/MemberCenter.vue'
 
 const routes = [
   {
@@ -33,9 +33,15 @@ const routes = [
   },
   {
     path: '/home',
-    name: 'Home',
+    name: 'LoginHome',
     component: LoginHome,
     meta: { title: '首页' },
+  },
+  {
+    path: '/membercenter',
+    name: 'MemberCenter',
+    component: MemberCenter,
+    meta: { title: '会员中心' },
   },
   {
     path: '/sports',
@@ -48,12 +54,6 @@ const routes = [
     name: 'Promotions',
     component: PromotionsPage,
     meta: { title: '优惠活动' },
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginPage,
-    meta: { title: '用户登录' },
   },
   {
     path: '/aboutus',
