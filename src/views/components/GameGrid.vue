@@ -74,14 +74,33 @@
       </div>
     </div>
   </div>
+
+  <LoginModal
+    v-if="showLoginModal"
+    @close="showLoginModal = false"
+    @show-register="
+      () => {
+        showLoginModal = false
+        showRegisterModal = true
+      }
+    "
+  />
+  <RegisterModal v-if="showRegisterModal" @close="showRegisterModal = false" />
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import LoginModal from '../components/LoginModal.vue'
+import RegisterModal from '@/views/components/RegisterModal.vue'
 import bgImg from '@/assets/images/gamegrid/slotgamebg.jpg'
 
-const router = useRouter()
+const showLoginModal = ref(false)
+const showRegisterModal = ref(false)
+
+const hoveredIndex = ref(null)
+function goToLogin() {
+  showLoginModal.value = true
+}
 
 const tabList = [
   { name: '电子城', icon: new URL('@/assets/images/gamegrid/slot1.png', import.meta.url).href },
@@ -231,10 +250,6 @@ const filteredGames = computed(() => {
   const start = activeTab.value * gamesPerGroup
   return allGames.slice(start, start + gamesPerGroup)
 })
-const hoveredIndex = ref(null)
-function goToLogin() {
-  router.push('/login')
-}
 </script>
 
 <style scoped>

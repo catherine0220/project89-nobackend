@@ -185,6 +185,7 @@ const isDev = import.meta.env.MODE === 'development'
 // 加载状态
 const loading = ref(false)
 
+// 表单验证规则
 const formRules = {
   username: [
     { required: true, message: '请输入您的帐户名称', trigger: 'blur' },
@@ -226,19 +227,29 @@ const formRules = {
   ],
 }
 
-const onFieldValidate = () => {
-  // 可选：你可以在这里添加额外的处理逻辑
+// 字段验证方法
+const validateField = async (prop) => {
+  try {
+    await formRef.value.validateField(prop)
+    fieldErrors[prop] = '' // 验证通过时清空错误
+  } catch (error) {
+    fieldErrors[prop] = error[0]?.message || '验证失败'
+  }
 }
 
-const handleReset = () => {
-  formRef.value.resetFields()
-  // 清空错误提示
-  Object.keys(fieldErrors).forEach((key) => {
-    fieldErrors[key] = ''
-  })
+// 密码强度检测
+const checkPasswordStrength = () => {
+  if (!formData.password) {
+    passwordStrength.value = 0
+    strengthText.value = ''
+    return
+  }
+  const result = zxcvbn(formData.password)
+  passwordStrength.value = result.score
+  strengthText.value = ['弱', '一般', '强', '非常强'][result.score] || ''
 }
 
-// 初始化验证码
+// 刷新验证码
 const refreshCaptcha = async () => {
   try {
     const { svg, text } = await getCaptcha()
@@ -250,64 +261,43 @@ const refreshCaptcha = async () => {
   }
 }
 
-// 字段验证方法
-const validateField = (prop) => {
-  formRef.value.validateField(prop)
-}
-
-// 密码强度检测
-const checkPasswordStrength = () => {
-  if (!formData.password) {
-    passwordStrength.value = 0
-    strengthText.value = ''
-    return
-  }
-
-  const result = zxcvbn(formData.password)
-  passwordStrength.value = result.score
-  strengthText.value = ['弱', '一般', '强', '非常强'][result.score] || ''
-}
-
-// 提交表单（关键修改部分）
+// 提交表单
 const handleSubmit = async () => {
-  console.log('开始提交注册表单')
-
   try {
-    // 1. 前端验证
+    // 1. 触发整体表单验证
     await formRef.value.validate()
 
     // 2. 验证确认密码
     if (formData.password !== formData.confirmPassword) {
+      fieldErrors.confirmPassword = '两次输入的密码不一致'
       ElMessage.error('两次输入的密码不一致')
       return
     }
 
     // 3. 验证用户协议
     if (!formData.agreement) {
+      fieldErrors.agreement = '请同意用户协议'
       ElMessage.error('请同意用户协议')
       return
     }
 
     // 4. 准备发送给后端的数据
-    const payload = {
-      username: formData.username,
-      password: formData.password,
-      real_name: formData.realName,
-      captcha: formData.captcha, // 添加验证码
-      captcha_key: captchaText.value, // 添加验证码key
-      // invitation_code: '', // 如果有邀请码功能
+    const payload = new URLSearchParams()
+    payload.append('username', formData.username)
+    payload.append('password', formData.password)
+    payload.append('real_name', formData.realName)
+    payload.append('captcha', formData.captcha)
+    // 如果有captcha_key，也添加进去
+    if (captchaText.value) {
+      payload.append('captcha_key', captchaText.value)
     }
-
-    console.log('提交数据:', payload)
 
     // 5. 发送注册请求
     loading.value = true
     const res = await register(payload)
 
-    console.log('后端响应:', res)
-
-    // 6. 处理响应 - 更灵活的成功判断
-    if (res && (res.code === 200 || res.status === 200 || res.success)) {
+    // 6. 处理响应
+    if (res.success) {
       ElMessage.success(res.message || '注册成功')
       emit('registered', res.data || res)
       emit('close')
@@ -320,14 +310,18 @@ const handleSubmit = async () => {
           }
         })
       }
-      ElMessage.error(res.message || res.msg || '注册失败')
-      refreshCaptcha() // 失败时刷新验证码
+      ElMessage.error(res.message || '注册失败')
+      refreshCaptcha()
     }
   } catch (error) {
-    console.error('注册错误:', error)
-    // 更详细的错误处理
-    const errorMsg =
-      error.response?.data?.message || error.response?.data?.msg || error.message || '网络错误'
+    // 同步表单验证错误到 fieldErrors
+    if (error.fields) {
+      Object.entries(error.fields).forEach(([field, errors]) => {
+        fieldErrors[field] = errors[0]?.message || ''
+      })
+    }
+    // 显示网络或其他错误
+    const errorMsg = error.message || error.response?.data?.message || '网络错误'
     ElMessage.error(errorMsg)
     refreshCaptcha()
   } finally {
@@ -335,10 +329,19 @@ const handleSubmit = async () => {
   }
 }
 
+// 重置表单
+const handleReset = () => {
+  formRef.value.resetFields()
+  Object.keys(fieldErrors).forEach((key) => {
+    fieldErrors[key] = ''
+  })
+}
+
+// 关闭模态框
 const handleClose = () => {
   emit('close')
 }
 
-// 初始化
+// 初始化验证码
 onMounted(refreshCaptcha)
 </script>

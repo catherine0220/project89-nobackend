@@ -17,11 +17,24 @@ import CockFighting from '@/views/Pages/CockFighting.vue'
 import FishingPage from '@/views/Pages/FishingPage.vue'
 import BoardPage from '@/views/Pages/BoardPage.vue'
 
+import CollabView from '@/views/components/CollabView.vue'
+import CommissionView from '@/views/components/CommissionView.vue'
+import RegistrationView from '@/views/components/RegistrationView.vue'
+import ReportView from '@/views/components/ReportView.vue'
+
+import LoginHome from '@/views/LoginPages/LoginHome.vue'
+
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: HomePage,
+    meta: { title: '首页' },
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: LoginHome,
     meta: { title: '首页' },
   },
   {
@@ -113,6 +126,26 @@ const routes = [
     name: 'BoardPage',
     component: BoardPage,
     meta: { title: '3D 纸牌游戏' },
+  },
+  {
+    path: '/collabagent',
+    name: 'collab',
+    component: CollabView,
+  },
+  {
+    path: '/commissionagent',
+    name: 'commission',
+    component: CommissionView,
+  },
+  {
+    path: '/registrationagent',
+    name: 'registration',
+    component: RegistrationView,
+  },
+  {
+    path: '/reportagent',
+    name: 'report',
+    component: ReportView,
   },
   // 404页面处理
   {

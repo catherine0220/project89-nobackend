@@ -65,7 +65,6 @@ import { ref, reactive, onMounted } from 'vue'
 import { CloseBold } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getCaptcha } from '@/utils/captcha'
-import { login } from '@/api/auth'
 
 const emit = defineEmits(['close', 'login-success', 'show-register'])
 
@@ -105,12 +104,12 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     loading.value = true
 
-    const res = await login({
+    const res = await {
       username: formData.username,
       password: formData.password,
       captcha: formData.captcha,
       captcha_key: captchaText.value,
-    })
+    }
 
     // 调试输出
     console.log('Login response:', res)
@@ -308,6 +307,7 @@ onMounted(refreshCaptcha)
   border: none;
   border-radius: 16px;
   background-color: #f81123;
+  cursor: pointer;
 }
 
 .register-btn:hover {

@@ -19,29 +19,43 @@
       </router-link>
       <div class="flex justify-end flex-1">
         <div class="right-section flex items-center gap-1">
-          <button class="login-button" @click="showLoginModal = true">登入</button>
-          <button class="register-button" @click="showRegister = true">注册</button>
-          <button class="try-button flex justify-center items-center gap-2" @click="showExp = true">
-            <img src="@/assets/images/gameicon.png" alt="game icon" class="w-5 h-5" />
-            注册体验
-          </button>
+          <div class="id-name">
+            <div class="id-title">账户:</div>
+            <div class="id-title2">ID Name</div>
+            <i class="fa fa-solid fa-message"></i>
+          </div>
+          <div class="id-name">
+            <div class="id-title">剩余:</div>
+            <div class="id-title2">0</div>
+            <i class="fa-solid fa-arrows-rotate text-yellow-300"></i>
+          </div>
+          <button class="id-name2">网上存款</button>
+          <button class="id-name2">在线提现</button>
+          <el-dropdown
+            placement="bottom-end"
+            popper-class="custom-dropdown"
+            trigger="click"
+            @visible-change="(val) => (dropdownVisible = val)"
+          >
+            <el-button class="custom-dropdown-btn">
+              <el-icon class="gold-icon rotate-icon" :class="{ open: dropdownVisible }">
+                <ArrowDownBold />
+              </el-icon>
+            </el-button>
+
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item>投注历史</el-dropdown-item>
+                <el-dropdown-item>交易详情</el-dropdown-item>
+                <el-dropdown-item>更改您的提款密码</el-dropdown-item>
+                <el-dropdown-item>会员中心</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
       </div>
     </div>
   </div>
-
-  <LoginModal
-    v-if="showLoginModal"
-    @close="showLoginModal = false"
-    @show-register="
-      () => {
-        showLoginModal = false
-        showRegisterModal = true
-      }
-    "
-  />
-  <RegisterModal v-if="showRegisterModal" @close="showRegisterModal = false" />
-  <ExpModal v-if="showExp" @close="showExp = false" />
 
   <!-- Navigation -->
   <div class="main-header">
@@ -90,14 +104,10 @@
 
 <script setup>
 import '@/assets/styles/main.css'
-import RegisterModal from '@/views/components/RegisterModal.vue'
-import LoginModal from '@/views/components/LoginModal.vue'
-import ExpModal from '@/views/components/ExpModal.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ArrowDownBold } from '@element-plus/icons-vue'
 
-const showRegisterModal = ref(false)
-const showLoginModal = ref(false)
-const showExp = ref(false)
+const dropdownVisible = ref(false)
 
 const vietnamTime = ref('')
 const vietnamDate = ref('')
@@ -244,47 +254,135 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-.login-button,
-.register-button,
-.try-button {
-  font-size: 15px;
-  font-weight: bold;
-  min-width: 140px;
-  padding: 8px 20px;
-  border-radius: 20px;
-  justify-content: center;
+.custom-dropdown .el-popper__arrow {
+  display: none !important;
+}
+
+.custom-dropdown {
+  position: absolute;
+  width: 180px !important;
+  height: auto !important;
+  z-index: 2 !important;
+  font-size: 12px !important;
+  border: 2px solid #ffd630 !important;
+  border-radius: 6px !important;
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  margin-top: 0 !important;
+  /* Add these to ensure proper positioning without arrow */
+  transform: none !important;
+}
+
+.custom-dropdown .el-dropdown-menu {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.custom-dropdown .el-dropdown-menu__item {
+  position: relative;
+  padding-left: 40px !important;
+  font-size: 12px;
+  color: white !important;
+  background-color: transparent !important;
+}
+
+/* 黑点初始样式 */
+.custom-dropdown .el-dropdown-menu__item::before {
+  content: '•';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: white;
+}
+
+/* Hover 效果：整条 item 背景变色 + 字变黄 + 黑点变黄 */
+.custom-dropdown .el-dropdown-menu__item:hover {
+  color: #ffd630 !important;
+}
+
+/* 同时黑点也变黄 */
+.custom-dropdown .el-dropdown-menu__item:hover::before {
+  color: #ffd630;
+}
+
+.rotate-icon {
+  transition: transform 0.3s ease;
+}
+
+.rotate-icon.open {
+  transform: rotate(180deg);
+}
+
+.custom-dropdown-btn {
+  width: 36px !important;
+  height: 36px !important;
+  border: none !important;
+  border-radius: 5px;
+  background-color: #484848 !important;
+  padding: 0px;
+  margin-left: 10px;
+}
+
+.gold-icon svg {
+  color: #ffd630 !important;
+  width: 30px;
+  height: 30px;
+}
+
+.fa-solid,
+.fas {
+  color: rgb(117, 233, 119);
+  padding: 5px 10px;
+  padding-left: 0px;
+}
+
+.id-name,
+.id-title,
+.id-title2 {
+  line-height: 26px;
+  font-size: 14px;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.id-name {
+  margin-left: 10px;
+  background: #484848;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+
+.id-title,
+.id-title2 {
+  padding: 5px 10px;
+}
+
+.id-title {
+  display: inline-block;
+  border-radius: 5px 0 0 5px;
+  background: #363636;
+}
+
+.id-title2 {
+  color: #fff48e;
+}
+
+.id-name2 {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  line-height: 26px;
+  font-size: 14px;
+  color: #fff;
+  border-radius: 5px;
+  border: none;
+  padding: 5px 30px;
+  margin-left: 10px;
+  background: #484848;
   cursor: pointer;
-}
-.login-button {
-  background-color: black;
-  color: #ffd630;
-  border: 2px solid #ffd630;
-}
-
-.login-button:hover,
-.try-button {
-  background-color: #484848;
-}
-
-.register-button {
-  background-color: #ffd630;
-  color: black;
-  border: 2px solid #ffd630;
-}
-
-.register-button:hover {
-  background-color: #fff87d;
-  border: 2px solid #fff87d;
-}
-
-.try-button {
-  color: #ffd630;
-  border: 2px solid #484848;
-}
-
-.try-button:hover {
-  background-color: #626262;
-  border: 2px solid #626262;
 }
 
 /* 时间显示样式 */
@@ -319,6 +417,7 @@ onBeforeUnmount(() => {
 .right-section {
   order: 2;
   gap: 12px;
+  width: 590px;
 }
 
 .time-display {
