@@ -24,19 +24,127 @@
 
           <div class="menu-options">
             <div class="action-buttons">
-              <div class="deposit-button">存款</div>
-              <div class="withdraw-button">提款</div>
+              <div
+                class="deposit-button"
+                :class="{ 'is-active': activeTab === 'deposit' }"
+                @click="switchTab('deposit')"
+              >
+                <i class="fas fa-donate"></i>
+                <span class="button-text">存款</span>
+              </div>
+              <div
+                class="withdraw-button"
+                :class="{ 'is-active': activeTab === 'withdraw' }"
+                @click="switchTab('withdraw')"
+              >
+                <i class="fas fa-hand-holding-usd"></i>
+                <span class="button-text">提款</span>
+              </div>
             </div>
-            <div class="menu-item">安全设置</div>
-            <div class="menu-item">VIP 区</div>
-            <div class="menu-item">最新公告</div>
-            <div class="menu-item">内部邮件</div>
-            <div class="menu-item">活动区域</div>
-            <div class="menu-item">交易详情</div>
-            <div class="menu-item">投注历史</div>
-            <div class="menu-item">退款</div>
-            <div class="menu-item">收藏 夹</div>
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'security' }"
+              @click="showSecurityTab"
+            >
+              <i class="fas fa-user-shield fa-fw"></i>
+              <span class="button-list">安全设置</span>
+            </div>
+
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'vip' }"
+              @click="switchTab('vip')"
+            >
+              <span class="img-membercenter-mask"></span>
+              <span class="button-list">VIP 区</span>
+            </div>
+
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'announcement' }"
+              @click="showAnnouncement"
+            >
+              <i class="fas fa-bullhorn"></i>
+              <span class="button-list">最新公告</span>
+            </div>
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'mail' }"
+              @click="switchTab('mail')"
+            >
+              <i class="fas fa-envelope"></i>
+              <span class="button-list">内部邮件</span>
+            </div>
+
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'activity' }"
+              @click="switchTab('activity')"
+            >
+              <i class="fas fa-trophy"></i>
+              <span class="button-list">活动区域</span>
+            </div>
+
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'transaction' }"
+              @click="switchTab('transaction')"
+            >
+              <i class="fas fa-clipboard-list fa-fw"></i>
+              <span class="button-list">交易详情</span>
+            </div>
+
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'betting' }"
+              @click="switchTab('betting')"
+            >
+              <i class="fas fa-history fa-fw"></i>
+              <span class="button-list">投注历史</span>
+            </div>
+
+            <div
+              class="menu-item"
+              :class="{ 'is-active': activeTab === 'refund' }"
+              @click="switchTab('refund')"
+            >
+              <i class="fa-solid fa-money-check-dollar"></i>
+              <span class="button-list">退款</span>
+            </div>
+
+            <div
+              class="menu-item"
+              style="border-radius: 0 0 10px 10px"
+              :class="{ 'is-active': activeTab === 'favorites' }"
+              @click="switchTab('favorites')"
+            >
+              <i class="fas fa-heart fa-fw"></i>
+              <span class="button-list">收藏夹</span>
+            </div>
           </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div class="dynamic-content">
+          <component
+            :is="currentComponent"
+            v-if="activeTab !== 'announcement' && !securitySubPage"
+            @navigate-to="handleSecurityNavigation"
+          />
+
+          <!-- Announcement component -->
+          <AnnouncementPage
+            v-if="activeTab === 'announcement'"
+            :key="announcementKey"
+            @close="returnFromAnnouncement"
+          />
+
+          <!-- Security sub-pages -->
+          <component
+            v-if="securitySubPage"
+            :is="securitySubPageComponent"
+            @go-back="returnToSecuritySettings"
+          />
         </div>
       </div>
     </div>
@@ -47,44 +155,171 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import HeaderLogin from '@/views/HeaderLogin.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
+
+// Main components
+import SavingPage from '@/views/components/SavingPage.vue'
+import WithdrawPage from '@/views/components/WithdrawPage.vue'
+import SecuritySettings from '@/views/components/SecuritySettings.vue'
+import VipZone from '@/views/components/VipZone.vue'
+import AnnouncementPage from '@/views/components/AnnouncementPage.vue'
+import InternalMail from '@/views/components/InternalMail.vue'
+import ActivityZone from '@/views/components/ActivityZone.vue'
+import TransactionDetails from '@/views/components/TransactionDetails.vue'
+import BettingHistory from '@/views/components/BettingHistory.vue'
+import RefundPage from '@/views/components/RefundPage.vue'
+import FavoritesPage from '@/views/components/FavoritesPage.vue'
+
+// Security sub-components
+import ChangePassword from '@/views/components/ChangePassword.vue'
+import ChangeMoneyPassword from '@/views/components/ChangeMoneyPassword.vue'
+import NameSettings from '@/views/components/NameSettings.vue'
+
+const activeTab = ref('deposit')
+const lastActiveTab = ref('deposit')
+const announcementKey = ref(0)
+const securitySubPage = ref(null)
+
+const componentsMap = {
+  deposit: SavingPage,
+  withdraw: WithdrawPage,
+  security: SecuritySettings,
+  vip: VipZone,
+  announcement: AnnouncementPage,
+  mail: InternalMail,
+  activity: ActivityZone,
+  transaction: TransactionDetails,
+  betting: BettingHistory,
+  refund: RefundPage,
+  favorites: FavoritesPage,
+}
+
+const securitySubPagesMap = {
+  'change-password': ChangePassword,
+  'change-money-password': ChangeMoneyPassword,
+  'name-settings': NameSettings,
+}
+
+const currentComponent = computed(() => componentsMap[activeTab.value] || SavingPage)
+const securitySubPageComponent = computed(() => securitySubPagesMap[securitySubPage.value])
+
+function switchTab(tab) {
+  securitySubPage.value = null
+  activeTab.value = tab
+}
+
+function showSecurityTab() {
+  securitySubPage.value = null
+  activeTab.value = 'security'
+}
+
+function showAnnouncement() {
+  lastActiveTab.value = activeTab.value
+  activeTab.value = 'announcement'
+  announcementKey.value++
+}
+
+function returnFromAnnouncement() {
+  activeTab.value = lastActiveTab.value
+}
+
+function handleSecurityNavigation(page) {
+  if (activeTab.value === 'security') {
+    securitySubPage.value = page
+  }
+}
+
+function returnToSecuritySettings() {
+  securitySubPage.value = null
+}
 </script>
 
 <style scoped>
+/* Existing styles remain unchanged */
+.img-membercenter-mask {
+  display: inline-block;
+  width: 22px;
+  height: 20px;
+  -webkit-mask-image: url('@/assets/images/membercenter1.svg');
+  mask-image: url('@/assets/images/membercenter1.svg');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  background: #fff;
+}
+
+.menu-item:hover .img-membercenter-mask,
+.menu-item.is-active .img-membercenter-mask {
+  background: black;
+}
+
+.button-list {
+  font-size: 16px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.fa-donate,
+.fa-hand-holding-usd {
+  margin-bottom: 10px;
+  font-size: 30px;
+}
+
+.button-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: inherit;
+}
+
 .action-buttons {
   display: flex;
-  border-bottom: 1px solid #eee;
+  border-bottom: 2px solid black;
 }
 
 .deposit-button {
-  border-right: 1px solid #eee;
+  border-right: 2px solid black;
 }
 
 .deposit-button,
 .withdraw-button {
   flex: 1;
-  padding: 10px;
+  padding: 20px;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.deposit-button:hover,
+.withdraw-button:hover {
+  color: black !important;
 }
 
 .account-sidebar {
-  width: 300px;
+  width: 300px !important;
   color: #fff;
   text-align: center;
-  border-radius: 10px;
-  background-color: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
-  overflow: hidden;
+  background-color: black;
 }
 
 .account-header {
-  padding: 20px;
+  height: 218px;
   background-color: #3b3b3b;
   border-bottom: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 10px 10px 0 0;
+}
+
+.fa-user-circle {
+  font-size: 60px;
 }
 
 .account-id {
@@ -101,19 +336,25 @@ import FooterMain from '@/views/FooterMain.vue'
 }
 
 .menu-options {
-  padding: 10px 0;
   background-color: #333;
+  border-radius: 0 0 10px 10px;
 }
 
 .menu-item {
-  padding: 12px 20px;
+  padding: 15px 44px;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: left;
 }
 
 .menu-item:hover,
 .deposit-button:hover,
-.withdraw-button:hover {
+.withdraw-button:hover,
+.menu-item.is-active,
+.deposit-button.is-active,
+.withdraw-button.is-active {
   color: black;
   background: linear-gradient(to bottom, #fffa74, #d7aa32);
 }
@@ -124,6 +365,8 @@ import FooterMain from '@/views/FooterMain.vue'
 
 .content-wrapper {
   width: 1200px;
+  display: flex;
+  gap: 20px;
 }
 
 .content {
@@ -138,5 +381,15 @@ import FooterMain from '@/views/FooterMain.vue'
   @apply text-yellow-300;
   padding: 5px 10px;
   padding-left: 0px;
+}
+
+.dynamic-content {
+  flex: 1;
+  margin-left: 10px;
+  background-color: black;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  width: 840px;
 }
 </style>

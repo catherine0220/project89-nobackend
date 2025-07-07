@@ -485,5 +485,6 @@ onBeforeUnmount(() => {
 .fa-door-open {
   color: white;
   font-size: 15px;
+  margin-right: 10px;
 }
 </style>
