@@ -78,17 +78,15 @@
     </div>
     <div class="btn-default">
       <button type="submit" class="btn">提交</button>
-      <button type="button" class="btn" @click="goBack">取消</button>
+      <button type="button" class="btn" @click="handleCancel">取消</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { WarnTriangleFilled } from '@element-plus/icons-vue'
 
-const router = useRouter()
 const ruleFormRef = ref()
 
 const ruleForm = ref({
@@ -122,8 +120,10 @@ const rules = {
   ],
 }
 
-const goBack = () => {
-  router.push({ name: 'SecuritySettings' })
+const emit = defineEmits(['cancel', 'go-back']) // 添加 go-back 事件
+
+const handleCancel = () => {
+  emit('go-back') // 发送返回事件
 }
 </script>
 

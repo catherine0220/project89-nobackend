@@ -152,6 +152,11 @@
     <!-- Footer -->
     <FooterMain />
   </div>
+  <component
+    v-if="securitySubPage"
+    :is="securitySubPageComponent"
+    @go-back="returnToSecuritySettings"
+  />
 </template>
 
 <script setup>
@@ -233,7 +238,7 @@ function handleSecurityNavigation(page) {
 }
 
 function returnToSecuritySettings() {
-  securitySubPage.value = null
+  securitySubPage.value = null // 清空子页面，返回 SecuritySettings
 }
 </script>
 

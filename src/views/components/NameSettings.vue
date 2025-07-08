@@ -58,7 +58,7 @@
     </div>
     <div class="btn-default">
       <button type="submit" class="btn">发送</button> -->
-      <button type="button" class="btn">取消</button>
+      <button type="button" class="btn" @click="handleCancel">取消</button>
     </div>
   </div>
 </template>
@@ -66,6 +66,12 @@
 <script setup>
 // import { ref } from 'vue'
 // import { WarnTriangleFilled } from '@element-plus/icons-vue'
+
+const emit = defineEmits(['cancel', 'go-back']) // 添加 go-back 事件
+
+const handleCancel = () => {
+  emit('go-back') // 发送返回事件
+}
 
 // const ruleFormRef = ref()
 
