@@ -214,6 +214,10 @@ const securitySubPageComponent = computed(() => securitySubPagesMap[securitySubP
 function switchTab(tab) {
   securitySubPage.value = null
   activeTab.value = tab
+
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
 }
 
 function showSecurityTab() {

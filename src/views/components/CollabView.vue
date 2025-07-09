@@ -109,7 +109,6 @@
   line-height: 2em;
 }
 
-/* ✨ 自动编号 h2 样式 */
 .numbered-section {
   counter-reset: h2-counter;
 }

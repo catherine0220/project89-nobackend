@@ -1,5 +1,16 @@
 <template>
-  <table class="table table-hover _37bNXha2rDTZyRUYuNmPiU">
+  <div class="action-buttons">
+    <button
+      class="delete"
+      :class="{ disabled: mailList.length === 0 }"
+      @click="mailList.length > 0 && deleteMails()"
+    >
+      <i class="fa fa-trash"></i>
+      删除
+    </button>
+  </div>
+
+  <table class="table table-hover">
     <thead>
       <tr>
         <th>主要主题</th>
@@ -29,11 +40,14 @@
 <script setup>
 import { ref } from 'vue'
 
-// 假数据，实际项目中应从 API 获取
-// const mailList = ref([
-//   { subject: '欢迎邮件', time: '2025-07-09 10:00' },
-//   { subject: '账户通知', time: '2025-07-08 15:30' },
-// ])
+const mailList = ref([
+  // { subject: '欢迎邮件', time: '2025-07-09 10:00' },
+  // { subject: '账户通知', time: '2025-07-08 15:30' },
+])
+
+const deleteMails = () => {
+  mailList.value = []
+}
 
 const allMailsLoaded = ref(true)
 const mailListNull = ref(true)
@@ -87,5 +101,23 @@ th {
   padding: 8px;
   border-bottom: 2px solid #ddd;
   text-align: left;
+}
+
+.action-buttons button {
+  font-size: 14px;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 6px 12px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.action-buttons .delete.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+  color: #999;
 }
 </style>

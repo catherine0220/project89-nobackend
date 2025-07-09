@@ -4,26 +4,38 @@
       <h3>内部邮箱</h3>
     </div>
     <div class="panel-body">
-      <ul class="nav-tabs">
-        <li
-          v-for="tab in tabs"
-          :key="tab.id"
-          :class="{ active: tab.active }"
-          @click.prevent="activateTab(tab.id)"
-        >
-          <a href="#">
-            <i v-if="tab.id === 1" class="fa-solid fa-star mr-1"></i>
-            {{ tab.name }}
-            <span v-if="tab.count">({{ tab.count }})</span>
-          </a>
-        </li>
-      </ul>
+      <div class="tab-header">
+        <ul class="nav-tabs">
+          <li
+            v-for="tab in tabs"
+            :key="tab.id"
+            :class="{ active: tab.active }"
+            @click.prevent="activateTab(tab.id)"
+          >
+            <a href="#">
+              <i v-if="tab.id === 1" class="fa-solid fa-star mr-1"></i>
+              {{ tab.name }}
+              <span v-if="tab.count">({{ tab.count }})</span>
+            </a>
+          </li>
+        </ul>
+        <button class="sent-mail-btn" @click="showSendMailModal = true">
+          <i class="far fa-comment"></i>
+          发送邮件
+        </button>
+      </div>
 
       <div class="tab-content">
         <PromotionBox v-if="activeTab === 1" />
         <MailBox v-if="activeTab === 2" />
         <InboxMail v-if="activeTab === 3" />
-        <SentMail v-if="activeTab === 4" />
+      </div>
+
+      <!-- Send Mail Modal -->
+      <div v-if="showSendMailModal" class="modal-overlay">
+        <div class="modal-content">
+          <SentMail @close="showSendMailModal = false" @send="handleSendMail" />
+        </div>
       </div>
     </div>
   </div>
@@ -40,16 +52,24 @@ const tabs = ref([
   { id: 1, name: '促销盒', active: true, count: 0 },
   { id: 2, name: '邮箱', active: false, count: 0 },
   { id: 3, name: '收件箱', active: false, count: 0 },
-  { id: 4, name: '发送邮件', active: false, count: 0 },
 ])
 
 const activeTab = ref(1)
+const showSendMailModal = ref(false)
 
 const activateTab = (tabId) => {
   activeTab.value = tabId
   tabs.value.forEach((tab) => {
     tab.active = tab.id === tabId
   })
+}
+
+// 在 InternalMail.vue 的 script setup 部分添加
+const handleSendMail = (mailData) => {
+  // 这里添加发送邮件的逻辑
+  console.log('发送邮件:', mailData)
+  // 可以在这里调用API发送邮件
+  showSendMailModal.value = false
 }
 
 onMounted(() => {
@@ -91,10 +111,17 @@ onMounted(() => {
 
 .panel-body {
   padding: 15px;
+  position: relative;
+}
+
+.tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
 }
 
 .nav-tabs {
-  border-bottom: 1px solid #ddd;
   display: flex;
   padding-left: 0;
   margin: 0;
@@ -126,6 +153,68 @@ onMounted(() => {
   border-bottom-color: transparent;
   cursor: default;
 }
+
+.sent-mail-btn {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #204d74;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  border: 1px solid transparent;
+  text-align: center;
+}
+
+.sent-mail-btn:hover {
+  background-color: #286090;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+/* .modal-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h4 {
+  margin: 0;
+} */
+
+/* .close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.modal-body {
+  padding: 15px;
+} */
 
 .email-table {
   width: 100%;
