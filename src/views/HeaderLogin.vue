@@ -45,9 +45,9 @@
 
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="goTo('/home')">投注历史</el-dropdown-item>
-                <el-dropdown-item @click="goTo('/home')">交易详情</el-dropdown-item>
-                <el-dropdown-item @click="goTo('/home')">更改您的提款密码</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/membercenter#betting')">投注历史</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/membercenter#transaction')">交易详情</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/membercenter#withdraw')">更改您的提款密码</el-dropdown-item>
                 <el-dropdown-item @click="goTo('/membercenter')">会员中心</el-dropdown-item>
               </el-dropdown-menu>
               <div class="login-logout-button ml-[20px] mb-[10px]" @click="handleLogout">

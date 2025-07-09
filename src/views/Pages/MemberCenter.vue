@@ -12,7 +12,7 @@
     <ABar />
     <div class="content">
       <div class="content-wrapper">
-        <div class="account-sidebar">
+        <div class="account-sidebar" v-if="!isSidebarHidden">
           <div class="account-header">
             <i class="fas fa-user-circle"></i>
             <div class="account-id">帐户 CAT0216</div>
@@ -125,10 +125,18 @@
         </div>
 
         <!-- Dynamic Content Area -->
-        <div class="dynamic-content">
+        <div
+          class="dynamic-content"
+          :style="{
+            width: isSidebarHidden ? 'calc(100% - 20px)' : '840px',
+            marginLeft: isSidebarHidden ? '0' : '10px',
+          }"
+        >
           <component
             :is="currentComponent"
             v-if="activeTab !== 'announcement' && !securitySubPage"
+            :is-sidebar-collapsed="isSidebarHidden"
+            @toggle-sidebar="toggleSidebar"
             @navigate-to="handleSecurityNavigation"
           />
 
@@ -152,18 +160,15 @@
     <!-- Footer -->
     <FooterMain />
   </div>
-  <component
-    v-if="securitySubPage"
-    :is="securitySubPageComponent"
-    @go-back="returnToSecuritySettings"
-  />
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, provide } from 'vue'
+import { useRoute } from 'vue-router'
 import HeaderLogin from '@/views/HeaderLogin.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
+import { onMounted, watch } from 'vue'
 
 // Main components
 import SavingPage from '@/views/components/SavingPage.vue'
@@ -187,6 +192,26 @@ const activeTab = ref('deposit')
 const lastActiveTab = ref('deposit')
 const announcementKey = ref(0)
 const securitySubPage = ref(null)
+const isSidebarHidden = ref(false)
+
+const tabSidebarStates = ref({
+  deposit: false,
+  withdraw: false,
+  security: false,
+  vip: false,
+  mail: false,
+  activity: false,
+  transaction: false,
+  betting: false,
+  refund: false,
+  favorites: false,
+})
+
+// Provide the sidebar state to child components
+provide('sidebar', {
+  isCollapsed: isSidebarHidden,
+  toggle: toggleSidebar,
+})
 
 const componentsMap = {
   deposit: SavingPage,
@@ -202,6 +227,25 @@ const componentsMap = {
   favorites: FavoritesPage,
 }
 
+const route = useRoute()
+
+onMounted(() => {
+  const hash = route.hash.replace('#', '')
+  if (hash) {
+    switchTab(hash)
+  }
+})
+
+watch(
+  () => route.hash,
+  (newHash) => {
+    const tab = newHash.replace('#', '')
+    if (tab) {
+      switchTab(tab)
+    }
+  },
+)
+
 const securitySubPagesMap = {
   'change-password': ChangePassword,
   'change-money-password': ChangeMoneyPassword,
@@ -211,13 +255,21 @@ const securitySubPagesMap = {
 const currentComponent = computed(() => componentsMap[activeTab.value] || SavingPage)
 const securitySubPageComponent = computed(() => securitySubPagesMap[securitySubPage.value])
 
+function toggleSidebar() {
+  isSidebarHidden.value = !isSidebarHidden.value
+  tabSidebarStates.value[activeTab.value] = isSidebarHidden.value
+}
+
 function switchTab(tab) {
+  if (activeTab.value) {
+    tabSidebarStates.value[activeTab.value] = isSidebarHidden.value
+  }
+
   securitySubPage.value = null
   activeTab.value = tab
+  isSidebarHidden.value = tabSidebarStates.value[tab]
 
-  requestAnimationFrame(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function showSecurityTab() {
@@ -242,7 +294,7 @@ function handleSecurityNavigation(page) {
 }
 
 function returnToSecuritySettings() {
-  securitySubPage.value = null // 清空子页面，返回 SecuritySettings
+  securitySubPage.value = null
 }
 </script>
 
@@ -345,7 +397,7 @@ function returnToSecuritySettings() {
 }
 
 .menu-options {
-  background-color: #333;
+  background-color: #222;
   border-radius: 0 0 10px 10px;
 }
 
