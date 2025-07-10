@@ -65,8 +65,13 @@ import { ref, reactive, onMounted } from 'vue'
 import { CloseBold } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getCaptcha } from '@/utils/captcha'
+import { login } from '@/api/auth'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/utils/auth'
 
 const emit = defineEmits(['close', 'login-success', 'show-register'])
+const router = useRouter()
+const auth = useAuth()
 
 const formRef = ref()
 const formData = reactive({
@@ -104,32 +109,27 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     loading.value = true
 
-    const res = await {
+    // 调用登录API
+    const res = await login({
       username: formData.username,
       password: formData.password,
-      captcha: formData.captcha,
-      captcha_key: captchaText.value,
-    }
+    })
 
-    // 调试输出
-    console.log('Login response:', res)
-
-    // 修改为更灵活的成功判断
-    if (res && (res.code === 200 || res.status === 200 || res.success)) {
+    if (res.success) {
       ElMessage.success(res.message || '登录成功')
-      emit('login-success', res.data || res)
+      // 存储用户信息到本地
+      localStorage.setItem('user', JSON.stringify(res.data))
+      auth.login(res.data)
+      emit('login-success', res.data)
       emit('close')
+      router.push('/home')
     } else {
-      const errorMsg = res.message || res.msg || '登录失败'
-      ElMessage.error(errorMsg)
+      ElMessage.error(res.message || '登录失败')
       refreshCaptcha()
     }
   } catch (error) {
     console.error('Login error:', error)
-    // 更详细的错误处理
-    const errorMsg =
-      error.response?.data?.message || error.response?.data?.msg || error.message || '网络错误'
-    ElMessage.error(errorMsg)
+    ElMessage.error(error.message || '请检查登录信息是否正确')
     refreshCaptcha()
   } finally {
     loading.value = false

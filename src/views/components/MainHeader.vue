@@ -1,49 +1,5 @@
+<!-- MainHeader.vue -->
 <template>
-  <!-- Top Login Bar -->
-  <div class="topnav flex flex-col h-20">
-    <div class="datecontainer w-[1200px] h-6 mx-auto relative">
-      <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
-        <span class="date">{{ vietnamDate }}</span>
-        <span class="time">{{ vietnamTime }}</span>
-        <img
-          src="https://flagcdn.com/w40/vn.png"
-          alt="VN"
-          class="w-6 h-4 object-cover rounded-sm ml-2"
-        />
-      </div>
-    </div>
-
-    <div class="w-[1200px] mx-auto flex justify-between items-center">
-      <router-link to="/" class="logo absolute top-[20px] h-10">
-        <img src="@/assets/images/logo.png" alt="Logo" class="h-full cursor-pointer" />
-      </router-link>
-      <div class="flex justify-end flex-1">
-        <div class="right-section flex items-center gap-1">
-          <button class="login-button" @click="handleLoginClick">登入</button>
-          <button class="register-button" @click="showRegisterModal = true">注册</button>
-          <button class="try-button flex justify-center items-center gap-2" @click="showExp = true">
-            <img src="@/assets/images/gameicon.png" alt="game icon" class="w-5 h-5" />
-            注册体验
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <LoginModal
-    v-if="showLoginModal"
-    @close="showLoginModal = false"
-    @login-success="showLoginModal = false"
-    @show-register="
-      () => {
-        showLoginModal = false
-        showRegisterModal = true
-      }
-    "
-  />
-  <RegisterModal v-if="showRegisterModal" @close="showRegisterModal = false" />
-  <ExpModal v-if="showExp" @close="showExp = false" />
-
   <!-- Navigation -->
   <div class="main-header">
     <div class="w-[1200px] mx-auto p-3">
@@ -90,28 +46,9 @@
 </template>
 
 <script setup>
-import '@/assets/styles/main.css'
-import RegisterModal from '@/views/components/RegisterModal.vue'
-import LoginModal from '@/views/components/LoginModal.vue'
-import ExpModal from '@/views/components/ExpModal.vue'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useAuth } from '@/utils/auth'
+import { ref } from 'vue'
 
-const auth = useAuth()
-const showLoginModal = ref(false)
-const showRegisterModal = ref(false)
-const showExp = ref(false)
-
-const handleLoginClick = () => {
-  if (!auth.isLoggedIn.value) {
-    showLoginModal.value = true
-  }
-}
-
-const vietnamTime = ref('')
-const vietnamDate = ref('')
 const activeIndex = ref(null)
-let timer = null
 let closeTimer = null
 
 const handleMouseEnter = (index) => {
@@ -213,137 +150,9 @@ const menuItems = [
     path: '/support',
   },
 ]
-
-// 获取越南时间
-const updateVietnamTime = () => {
-  const now = new Date()
-
-  // 越南时区 (UTC+7)
-  const options = {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    hour12: false,
-  }
-
-  // 时间格式: 14:30
-  vietnamTime.value = now.toLocaleTimeString('vi-VN', {
-    ...options,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
-
-  // 新日期格式: yy/mm/dd (T3)
-  const weekdayShort = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][now.getDay()]
-  const year = now.getFullYear().toString().slice(0)
-  const month = (now.getMonth() + 1).toString().padStart(2, '0')
-  const day = now.getDate().toString().padStart(2, '0')
-
-  vietnamDate.value = `${year}/${month}/${day} (${weekdayShort})`
-}
-
-onMounted(() => {
-  updateVietnamTime()
-  // 每秒更新一次
-  timer = setInterval(updateVietnamTime, 1000)
-})
-
-onBeforeUnmount(() => {
-  clearInterval(timer)
-})
 </script>
 
-<style>
-.login-button,
-.register-button,
-.try-button {
-  font-size: 15px;
-  font-weight: bold;
-  min-width: 140px;
-  padding: 8px 20px;
-  border-radius: 20px;
-  justify-content: center;
-  cursor: pointer;
-}
-.login-button {
-  background-color: black;
-  color: #ffd630;
-  border: 2px solid #ffd630;
-}
-
-.login-button:hover,
-.try-button {
-  background-color: #484848;
-}
-
-.register-button {
-  background-color: #ffd630;
-  color: black;
-  border: 2px solid #ffd630;
-}
-
-.register-button:hover {
-  background-color: #fff87d;
-  border: 2px solid #fff87d;
-}
-
-.try-button {
-  color: #ffd630;
-  border: 2px solid #484848;
-}
-
-.try-button:hover {
-  background-color: #626262;
-  border: 2px solid #626262;
-}
-
-/* 时间显示样式 */
-.time-display {
-  order: 1;
-  margin-right: auto;
-  margin-left: 2rem;
-}
-
-.time-box {
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  min-width: 180px;
-  justify-content: center;
-}
-
-.time {
-  font-size: 15px;
-  letter-spacing: 0.5px;
-  color: #fef3c7;
-}
-
-.date {
-  color: #d1d5db;
-}
-
-.separator {
-  font-weight: bold;
-}
-
-.right-section {
-  order: 2;
-  gap: 12px;
-}
-
-.time-display {
-  right: 0;
-}
-
-.datecontainer {
-  margin: 3px;
-}
-.date,
-.time {
-  color: white;
-  font-size: 14px;
-  margin-left: 5px;
-}
-
+<style scoped>
 .main-header {
   height: 72px;
 }

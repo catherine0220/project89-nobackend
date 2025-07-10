@@ -16,30 +16,36 @@
           <p class="time-range">{{ currentDateTime }} ~ <span>现在</span></p>
 
           <table class="refund-table">
-  <thead>
-    <tr>
-      <th class="col-4">游戏名称</th>
-      <th class="col-4">符合条件的投注总分</th>
-      <th class="col-4">退款</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="(game, index) in gameDetails" :key="index" class="game-item">
-      <td class="col-4">{{ game.name }}</td>
-      <td class="col-4">{{ game.betAmount }}</td>
-      <td class="col-4">{{ game.refundAmount }}</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr class="detail-footer">
-      <td colspan="2" class="text-right">总数</td>
-      <td class="col-4">{{ totalRefund }}</td>
-    </tr>
-  </tfoot>
-</table>
+            <thead>
+              <tr>
+                <th class="col-4">游戏名称</th>
+                <th class="col-4">符合条件的投注总分</th>
+                <th class="col-4">退款</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(game, index) in gameDetails" :key="index" class="game-item">
+                <td class="col-4">{{ game.name }}</td>
+                <td class="col-4">{{ game.betAmount }}</td>
+                <td class="col-4">{{ game.refundAmount }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="detail-footer">
+                <td colspan="2" class="text-right">总数</td>
+                <td class="col-4">{{ totalRefund }}</td>
+              </tr>
+            </tfoot>
+          </table>
 
           <div class="action-buttons">
-            <button class="refresh-btn" @click="refreshData" :style="{ backgroundImage: `url(${refreshImg})` }">刷新</button>
+            <button
+              class="refresh-btn"
+              @click="refreshData"
+              :style="{ backgroundImage: `url(${refreshImg})` }"
+            >
+              刷新
+            </button>
           </div>
         </div>
       </div>
@@ -136,23 +142,23 @@ tr {
 
 .refund-table th {
   color: black;
-  font-weight: normal; 
+  font-weight: normal;
 }
 
 .refund-table td,
 .refund-table th {
   color: black;
-  padding: 8px 4px; 
+  padding: 8px 4px;
   text-align: center;
 }
 
 .refund-table tfoot td {
   color: #f63232;
-  padding: 10px 12px; 
+  padding: 10px 12px;
   background-color: white;
 }
 
-.text-right{
+.text-right {
   text-align: right !important;
   padding-right: 50px !important ;
 }
@@ -205,12 +211,14 @@ tr {
   text-align: center;
   width: 100%;
   margin: 0px;
+  margin-bottom: 50px;
 }
 
 .close-btn {
   color: transparent;
-  font-size: 28px;
+  font-size: 30px;
   cursor: pointer;
+  margin-bottom: 50px;
 }
 
 .modal-body {

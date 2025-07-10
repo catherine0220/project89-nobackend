@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <HeaderMain />
+    <DynamicHeader />
 
     <!-- Banner -->
     <div class="flex justify-center">
@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import HeaderMain from '@/views/HeaderMain.vue'
+import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
 import GameLobby from '../components/GameLobby.vue'

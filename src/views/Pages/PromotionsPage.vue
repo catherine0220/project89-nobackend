@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <HeaderMain />
+    <DynamicHeader />
 
     <!-- Banner -->
     <div class="flex justify-center">
@@ -10,16 +10,17 @@
 
     <!-- Announcement -->
     <ABar />
-
-    <div class="image-gallery">
-      <!-- 图片展示区域 -->
-      <el-row :gutter="20">
-        <el-col v-for="(image, index) in imageList" :key="index" :span="12" :offset="0">
-          <el-card :body-style="{ padding: '0px' }">
-            <img :src="image.url" class="image-item" />
-          </el-card>
-        </el-col>
-      </el-row>
+    <div class="img">
+      <div class="image-gallery">
+        <!-- 图片展示区域 -->
+        <el-row :gutter="20">
+          <el-col v-for="(image, index) in imageList" :key="index" :span="12" :offset="0">
+            <el-card :body-style="{ padding: '0px' }">
+              <img :src="image.url" class="image-item" />
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
     </div>
 
     <!-- Footer -->
@@ -28,7 +29,7 @@
 </template>
 
 <script setup>
-import HeaderMain from '@/views/HeaderMain.vue'
+import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
 import { ref } from 'vue'
@@ -43,8 +44,15 @@ const imageList = ref([
 </script>
 
 <style scoped>
+.img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .image-gallery {
   padding: 20px;
+  width: 1200px;
 }
 
 .image-item {

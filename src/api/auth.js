@@ -32,3 +32,34 @@ export const register = (data) => {
       }
     })
 }
+
+export const login = (credentials) => {
+  return axios
+    .post('http://192.168.0.122/silver/user/user_login.php', credentials, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+    .then((response) => {
+      if (response.data.success) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message || '登录成功',
+        }
+      } else {
+        return {
+          success: false,
+          message: response.data.message || '登录失败',
+          errors: response.data.errors || {},
+        }
+      }
+    })
+    .catch((error) => {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || '请检查登录信息是否正确',
+        errors: error.response?.data?.errors || {},
+      }
+    })
+}

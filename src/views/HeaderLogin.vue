@@ -14,7 +14,7 @@
     </div>
 
     <div class="login-header-content w-[1200px] mx-auto flex justify-between items-center">
-      <router-link to="/" class="login-logo absolute top-[20px] h-10">
+      <router-link to="/home" class="login-logo absolute top-[20px] h-10">
         <img src="@/assets/images/logo.png" alt="Logo" class="h-full cursor-pointer" />
       </router-link>
       <div class="login-header-right flex justify-end flex-1">
@@ -22,15 +22,19 @@
           <div class="login-user-info">
             <div class="login-info-label">账户:</div>
             <div class="login-info-value">ID Name</div>
-            <i class="fa fa-solid fa-message"></i>
+            <i class="fa fa-solid fa-message" @click="goTo('/membercenter')"></i>
           </div>
           <div class="login-user-info">
             <div class="login-info-label">剩余:</div>
             <div class="login-info-value">0</div>
             <i class="fa-solid fa-arrows-rotate"></i>
           </div>
-          <button class="login-action-button">网上存款</button>
-          <button class="login-action-button">在线提现</button>
+          <button class="login-action-button" @click="goTo('/membercenter#deposit')">
+            网上存款
+          </button>
+          <button class="login-action-button" @click="goTo('/membercenter#withdraw')">
+            在线提现
+          </button>
           <el-dropdown
             placement="bottom-end"
             popper-class="login-user-dropdown"
@@ -46,13 +50,17 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="goTo('/membercenter#betting')">投注历史</el-dropdown-item>
-                <el-dropdown-item @click="goTo('/membercenter#transaction')">交易详情</el-dropdown-item>
-                <el-dropdown-item @click="goTo('/membercenter#withdraw')">更改您的提款密码</el-dropdown-item>
+                <el-dropdown-item @click="goTo('/membercenter#transaction')"
+                  >交易详情</el-dropdown-item
+                >
+                <el-dropdown-item @click="goTo('/membercenter#security')"
+                  >更改您的提款密码</el-dropdown-item
+                >
                 <el-dropdown-item @click="goTo('/membercenter')">会员中心</el-dropdown-item>
               </el-dropdown-menu>
-              <div class="login-logout-button ml-[20px] mb-[10px]" @click="handleLogout">
+              <div class="login-logout-button pl-[20px] pb-[10px]" @click="handleLogout">
                 <i class="fa-solid fa-door-open"> </i>
-                <span class="text-white text-[14px]">登出</span>
+                <span class="logout text-[14px]">登出</span>
               </div>
             </template>
           </el-dropdown>
@@ -111,7 +119,9 @@ import '@/assets/styles/main.css'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { ArrowDownBold } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/utils/auth'
 
+const auth = useAuth()
 const router = useRouter()
 
 const goTo = (path) => {
@@ -119,8 +129,7 @@ const goTo = (path) => {
 }
 
 const handleLogout = () => {
-  localStorage.removeItem('token')
-  router.push('/')
+  auth.logout()
 }
 
 const dropdownVisible = ref(false)
@@ -145,7 +154,7 @@ const handleMouseLeave = () => {
 const menuItems = [
   {
     label: '主页',
-    path: '/',
+    path: '/home',
   },
   {
     label: '爆炸罐',
@@ -264,6 +273,25 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
+.login-logout-button {
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.login-logout-button:hover {
+  color: #ffd630 !important;
+}
+
+.login-logout-button:hover {
+  color: #ffd630 !important;
+  cursor: pointer;
+}
+
+.login-logout-button:hover .fa-door-open {
+  color: #ffd630 !important;
+}
+
 .login-header-container {
   background-color: #1e1e1e;
 }
@@ -474,6 +502,7 @@ onBeforeUnmount(() => {
   color: rgb(117, 233, 119);
   padding: 5px 10px;
   padding-left: 0px;
+  cursor: pointer;
 }
 
 .fa-arrows-rotate {

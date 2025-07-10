@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <HeaderMain />
+    <DynamicHeader />
     <!-- Banner -->
     <div class="banner w-full">
       <el-carousel trigger="click" height="450px">
@@ -151,7 +151,7 @@
 <script setup>
 import '@/assets/styles/main.css'
 import '@/assets/styles/web.css'
-import HeaderMain from '@/views/HeaderMain.vue'
+import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import GameGrid from '@/views/components/GameGrid.vue'
 import FooterMain from '../FooterMain.vue'

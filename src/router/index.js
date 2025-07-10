@@ -35,7 +35,7 @@ const routes = [
     path: '/home',
     name: 'LoginHome',
     component: LoginHome,
-    meta: { title: '首页' },
+    meta: { requiresAuth: true },
   },
   {
     path: '/membercenter',
@@ -165,7 +165,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title ? `${to.meta.title} - 网站名称` : '网站名称'
+  document.title = to.meta.title ? `${to.meta.title} - 89 Bet` : '89 Bet'
 
   if (to.meta.requiresRefresh) {
     window.location.href = to.fullPath
