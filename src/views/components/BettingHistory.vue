@@ -91,7 +91,7 @@
             </div>
 
             <!-- 游戏类型 dropdown 保持不动 -->
-            <div class="game-picker flex items-center">
+            <div class="game-picker">
               <h6 class="section-label">游戏类型</h6>
               <el-dropdown trigger="click">
                 <el-button type="primary">
@@ -233,16 +233,40 @@ const formatDate = (date) => {
 </script>
 
 <style scoped>
+.game-picker {
+  display: flex;
+  align-items: center;
+}
+
 :deep(.el-dropdown .el-button) {
   height: 34px;
-  width: 180px;
+  width: 160px;
   background-color: #ffffff !important;
   color: #000000 !important;
   border-color: #dcdfe6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.el-button:focus) {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+:deep(.el-dropdown .el-button span) {
+  flex: 1;
+  text-align: center;
+}
+
+:deep(.el-icon--right) {
+  margin-left: auto;
 }
 
 :deep(.el-dropdown-menu) {
-  width: 180px !important;
   background-color: #ffffff !important;
   color: #000000 !important;
   border: 1px solid #dcdfe6;
@@ -358,6 +382,7 @@ const formatDate = (date) => {
   font-weight: 700;
   color: #333;
   margin: 0;
+  margin-right: 20px;
 }
 
 .content-text {
