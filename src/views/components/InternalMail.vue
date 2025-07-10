@@ -26,9 +26,9 @@
       </div>
 
       <div class="tab-content">
-        <PromotionBox v-if="activeTab === 1" />
-        <MailBox v-if="activeTab === 2" />
-        <InboxMail v-if="activeTab === 3" />
+        <PromotionBox v-if="activeTab === 1" @update-count="handlePromotionCountUpdate" />
+        <MailBox v-if="activeTab === 2" @update-count="handleMailboxCountUpdate" />
+        <InboxMail v-if="activeTab === 3" @update-count="handleInboxCountUpdate" />
       </div>
 
       <!-- Send Mail Modal -->
@@ -57,6 +57,21 @@ const tabs = ref([
 const activeTab = ref(1)
 const showSendMailModal = ref(false)
 
+const handlePromotionCountUpdate = (count) => {
+  const tab = tabs.value.find(t => t.id === 1)
+  if (tab) tab.count = count
+}
+
+const handleMailboxCountUpdate = (count) => {
+  const tab = tabs.value.find(t => t.id === 2)
+  if (tab) tab.count = count
+}
+
+const handleInboxCountUpdate = (count) => {
+  const tab = tabs.value.find(t => t.id === 3)
+  if (tab) tab.count = count
+}
+
 const activateTab = (tabId) => {
   activeTab.value = tabId
   tabs.value.forEach((tab) => {
@@ -64,20 +79,18 @@ const activateTab = (tabId) => {
   })
 }
 
-// 在 InternalMail.vue 的 script setup 部分添加
 const handleSendMail = (mailData) => {
-  // 这里添加发送邮件的逻辑
   console.log('发送邮件:', mailData)
-  // 可以在这里调用API发送邮件
   showSendMailModal.value = false
 }
 
 onMounted(() => {
-  activateTab(1) // 默认加载促销盒
+  activateTab(1)
 })
 </script>
 
 <style scoped>
+/* 原有CSS保持不变 */
 .fa-star {
   color: #ffca00;
 }
@@ -170,7 +183,6 @@ onMounted(() => {
   background-color: #286090;
 }
 
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -191,30 +203,6 @@ onMounted(() => {
   background-color: transparent;
   border-radius: 10px;
 }
-
-/* .modal-header {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h4 {
-  margin: 0;
-} */
-
-/* .close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-}
-
-.modal-body {
-  padding: 15px;
-} */
 
 .email-table {
   width: 100%;

@@ -27,29 +27,33 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 
-// 假数据，实际项目中应从 API 获取
-// const mailList = ref([
-//   { subject: '欢迎邮件', time: '2025-07-09 10:00' },
-//   { subject: '账户通知', time: '2025-07-08 15:30' },
-// ])
+const mailList = ref([
+  // { subject: '特别优惠', time: '2025-07-10 09:00' },
+  // { subject: '限时折扣', time: '2025-07-09 14:30' },
+])
 
-const allMailsLoaded = ref(true)
-const mailListNull = ref(true)
-const loading = ref(false)
+const allMailsLoaded = ref(false)
+const mailListNull = ref(false)
+const loading = ref(true)
+const emit = defineEmits(['update-count'])
 
-// 模拟数据加载过程
+const updateCount = () => {
+  emit('update-count', mailList.value.length)
+  mailListNull.value = mailList.value.length === 0
+}
+
 setTimeout(() => {
-  allMailsLoaded.value = true
   loading.value = false
-  // mailListNull.value = true // 你可以取消这行注释来测试"无数据"状态
-  // mailList.value = [] // 你可以取消这行注释来测试"无数据"状态
+  allMailsLoaded.value = true
+  updateCount()
 }, 1500)
 </script>
 
 <style scoped>
 .text-center {
+  height: 35px;
   font-size: 14px;
   color: black;
   padding: 8px;
@@ -87,5 +91,15 @@ th {
   padding: 8px;
   border-bottom: 2px solid #ddd;
   text-align: left;
+}
+
+tbody{
+  height: auto;
+}
+
+tbody tr{
+  height: 35px;
+  font-size: 12px;
+  color: black;
 }
 </style>

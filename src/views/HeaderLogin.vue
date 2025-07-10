@@ -22,7 +22,7 @@
           <div class="login-user-info">
             <div class="login-info-label">账户:</div>
             <div class="login-info-value">ID Name</div>
-            <i class="fa fa-solid fa-message" @click="goTo('/membercenter')"></i>
+            <i class="fa fa-solid fa-message" @click="goTo('/membercenter#mail')"></i>
           </div>
           <div class="login-user-info">
             <div class="login-info-label">剩余:</div>
