@@ -156,7 +156,9 @@
         </div>
       </div>
     </div>
-
+    <teleport to="body">
+      <RefundPage v-if="activeTab === 'refund'" @close="switchTab(lastActiveTab)" />
+    </teleport>
     <!-- Footer -->
     <FooterMain />
   </div>

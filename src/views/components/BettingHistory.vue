@@ -1,5 +1,5 @@
 <template>
-  <div class="transaction-panel">
+  <div class="betting-transaction-panel">
     <div class="panel-heading">
       <i
         :class="isCollapsed ? 'fas fa-arrow-circle-right' : 'fas fa-arrow-circle-left'"
@@ -96,6 +96,7 @@
               <el-dropdown trigger="click">
                 <el-button type="primary">
                   {{ selectedGameType || '选择' }}
+                  <!-- 显示选中项或默认"选择" -->
                   <el-icon class="el-icon--right"><arrow-down /></el-icon>
                 </el-button>
                 <template #dropdown>
@@ -117,50 +118,77 @@
           </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="divider">
+  <button class="search" @click="handleSearch" :disabled="isLoading">
+    <span v-if="!isLoading">搜索</span>
+    <i v-else class="el-icon-loading"></i>
+  </button>
+</div>
 
         <table class="elegant-table">
-          <thead>
-            <tr>
-              <th class="table-header">游戏名称</th>
-              <th class="table-header">付款期</th>
-              <th class="table-header">有效投注</th>
-              <th class="table-header">减少</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="bets.length === 0">
-              <td colspan="4" class="table-data">暂无数据</td>
-            </tr>
-            <tr v-for="(bet, index) in bets" :key="index">
-              <td class="table-data">{{ bet.gameName }}</td>
-              <td class="table-data">{{ formatDate(bet.paymentDate) }}</td>
-              <td class="table-data">{{ bet.validBet }}</td>
-              <td class="table-data">{{ bet.reduction }}</td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="table-h-container">
+      <div class="table-row">
+        <div class="table-header" style="text-align: left; width: 25%;">游戏名称</div>
+        <div class="table-header" style="text-align: left; width: 25%;">付款期</div>
+        <div class="table-header" style="text-align: right; width: 25%;">有效投注</div>
+        <div class="table-header" style="text-align: right; width: 25%;">减少</div>
+      </div>
+      
+      <!-- 显示加载状态 -->
+      <div v-if="isLoading" class="table-row">
+        <div class="table-data" colspan="4" style="text-align: center;">
+          <el-icon><Loading /></el-icon> 加载中...
+        </div>
+      </div>
+      
+      <!-- 显示实际数据 -->
+      <template v-else>
+        <div class="table-row" v-for="(bet, index) in bets" :key="index">
+          <div class="table-data" style="text-align: left; width: 25%;">{{ bet.gameName }}</div>
+          <div class="table-data" style="text-align: left; width: 25%;">{{ formatDate(bet.paymentDate) }}</div>
+          <div class="table-data" style="text-align: right; width: 25%;">{{ bet.validBet }}</div>
+          <div class="table-data" style="text-align: right; width: 25%;">{{ bet.reduction }}</div>
+        </div>
+        
+        <!-- 总计行 -->
+        <div class="table-row">
+          <div class="table-data" style="text-align: left; width: 25%;">
+            总计：{{ bets.length }} 订单
+          </div>
+          <div class="table-data" style="text-align: left; width: 25%;">-</div>
+          <div class="table-data" style="text-align: right; width: 25%;">
+            {{ totalValidBets }}
+          </div>
+          <div class="table-data" style="text-align: right; width: 25%;">
+            {{ totalReduction }}
+          </div>
+        </div>
+      </template>
+    </div>
+  </table>
 
-        <div class="divider"></div>
-
-        <div class="summary-text">总计：单{{ total }}</div>
-
-        <div class="disclosure-text">所有信息都已披露</div>
+        <div class="disclosure-text">
+          <i v-if="isLoading" class="el-icon-loading"></i>
+          {{ isLoading ? '读取数据...' : '所有信息都已披露' }}
+        </div>
       </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, inject, watch } from 'vue'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ref, computed, inject, watch } from 'vue'
+import { ArrowDown, Loading } from '@element-plus/icons-vue'
 
 // Sidebar 状态
 const loading = ref(false)
 const { isCollapsed, toggle } = inject('sidebar')
 const toggleSidebar = () => toggle()
 
-// 日期区间（默认不启用，不设值）
+// 加载状态
+const isLoading = ref(false)
+
+// 日期区间
 const bettingStartDate = ref(null)
 const bettingEndDate = ref(null)
 const paymentStartDate = ref(null)
@@ -171,13 +199,31 @@ const isBettingDateEnabled = ref(false)
 const isPaymentDateEnabled = ref(false)
 const searchUnpaidOnly = ref(false)
 
-// 禁止同时启用两个
+// 游戏类型
+const gameTypeOptions = ref(['百家乐', '龙虎', '轮盘', '骰宝'])
+const selectedGameType = ref('')
+
+// 表格数据
+const isEmpty = ref(false)
+const bets = ref([])
+const total = ref(0)
+
+// 计算属性
+const totalValidBets = computed(() => {
+  return bets.value.reduce((sum, bet) => sum + (parseFloat(bet.validBet) || 0), 0)
+})
+
+const totalReduction = computed(() => {
+  return bets.value.reduce((sum, bet) => sum + (parseFloat(bet.reduction) || 0), 0)
+})
+
+// 切换函数
 const toggleBettingDateEnabled = () => {
   isBettingDateEnabled.value = !isBettingDateEnabled.value
   if (isBettingDateEnabled.value) {
     isPaymentDateEnabled.value = false
   } else {
-    searchUnpaidOnly.value = false // 关闭下注时间时自动取消 unpaid 勾选
+    searchUnpaidOnly.value = false
   }
 }
 
@@ -185,16 +231,18 @@ const togglePaymentDateEnabled = () => {
   isPaymentDateEnabled.value = !isPaymentDateEnabled.value
   if (isPaymentDateEnabled.value) {
     isBettingDateEnabled.value = false
-    searchUnpaidOnly.value = false // 确保 unpaid checkbox 被关闭
+    searchUnpaidOnly.value = false
   }
 }
 
+// 监听器
 watch(isBettingDateEnabled, (val) => {
   if (!val) {
     bettingStartDate.value = null
     bettingEndDate.value = null
   }
 })
+
 watch(isPaymentDateEnabled, (val) => {
   if (!val) {
     paymentStartDate.value = null
@@ -202,45 +250,144 @@ watch(isPaymentDateEnabled, (val) => {
   }
 })
 
-// 游戏类型下拉菜单
-const gameTypeOptions = ref([]) // 例如 ['百家乐', '龙虎', ...]
-const selectedGameType = ref('')
+// 选择游戏类型
 const selectGameType = (gameType) => {
   selectedGameType.value = gameType
 }
 
-// 表格数据
-const isEmpty = ref(false)
-const bets = ref([])
-const total = ref(0)
+// 搜索函数
+const handleSearch = async () => {
+  try {
+    isLoading.value = true
+    isEmpty.value = false
+    
+    // 构建搜索参数
+    const params = {
+      gameType: selectedGameType.value,
+      startDate: isBettingDateEnabled.value ? bettingStartDate.value : null,
+      endDate: isBettingDateEnabled.value ? bettingEndDate.value : null,
+      paymentStart: isPaymentDateEnabled.value ? paymentStartDate.value : null,
+      paymentEnd: isPaymentDateEnabled.value ? paymentEndDate.value : null,
+      unpaidOnly: searchUnpaidOnly.value
+    }
+    
+    // 调用API - 这里使用模拟数据，实际项目中替换为真实API调用
+    const response = await mockApiCall(params)
+    
+    bets.value = response.data
+    total.value = response.data.length
+    
+    // 如果没有数据
+    if (response.data.length === 0) {
+      isEmpty.value = true
+    }
+  } catch (error) {
+    console.error('搜索失败:', error)
+    isEmpty.value = true
+  } finally {
+    isLoading.value = false
+  }
+}
 
-// 日期格式化
+// 更新模拟API调用函数，接收参数
+const mockApiCall = (params) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // 根据搜索参数过滤模拟数据
+      const mockData = [
+        {
+          gameName: '百家乐',
+          paymentDate: new Date(),
+          validBet: '1000',
+          reduction: '50'
+        },
+        {
+          gameName: '轮盘',
+          paymentDate: new Date(Date.now() - 86400000),
+          validBet: '500',
+          reduction: '25'
+        }
+      ].filter(item => {
+        // 简单模拟过滤逻辑
+        if (params.gameType && item.gameName !== params.gameType) return false
+        // 这里可以添加更多过滤条件...
+        return true
+      })
+      
+      resolve({ data: mockData })
+    }, 1000)
+  })
+}
+
+// 日期格式化函数
 const formatDate = (date) => {
   if (!date) return ''
   const d = new Date(date)
-  return d
-    .toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    })
-    .replace(/\//g, '/')
+  return d.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).replace(/\//g, '/')
 }
+
+// 初始化加载数据
+handleSearch()
 </script>
 
+<style>
+.betting-transaction-panel .el-dropdown-menu {
+  min-width: 180px !important;
+  width: 180px !important;
+}
+
+.betting-transaction-panel .el-dropdown-menu__item {
+  color: #000000 !important;
+  font-size: 14px;
+  padding: 0 16px;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+</style>
+
 <style scoped>
+.el-icon-loading {
+  animation: rotating 2s linear infinite;
+}
+@keyframes rotating {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.search {
+  width: 70px;
+  height: 27px;
+  padding: 0;
+  line-height: 27px;
+  background: url('@/assets/images/searchbet.png') no-repeat center top;
+  background-position: center top;
+  border: none;
+}
+
+.search:hover {
+  background-position: center bottom;
+}
+
 .game-picker {
   display: flex;
   align-items: center;
 }
 
-:deep(.el-dropdown .el-button) {
+::v-deep(.el-dropdown .el-button) {
   height: 34px;
-  width: 160px;
+  width: 180px;
   background-color: #ffffff !important;
   color: #000000 !important;
   border-color: #dcdfe6;
@@ -249,7 +396,7 @@ const formatDate = (date) => {
   justify-content: center;
 }
 
-:deep(.el-button:focus) {
+::v-deep(.el-button:focus) {
   border-color: #66afe9;
   outline: 0;
   box-shadow:
@@ -257,32 +404,21 @@ const formatDate = (date) => {
     0 0 8px rgba(102, 175, 233, 0.6);
 }
 
-:deep(.el-dropdown .el-button span) {
+::v-deep(.el-dropdown .el-button span) {
   flex: 1;
   text-align: center;
 }
 
-:deep(.el-icon--right) {
+::v-deep(.el-icon--right) {
   margin-left: auto;
 }
 
-:deep(.el-dropdown-menu) {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #dcdfe6;
-}
-
-:deep(.el-dropdown-menu__item) {
-  color: #000000 !important;
-  font-size: 14px;
-}
-
-:deep(.el-dropdown-menu__item:hover) {
+::v-deep(.el-dropdown-menu__item:hover) {
   background-color: #f2f2f2 !important;
   color: #000000 !important;
 }
 
-.transaction-panel {
+.betting-transaction-panel {
   border: 1px solid #fff;
   border-radius: 4px;
 }
@@ -309,7 +445,7 @@ const formatDate = (date) => {
   color: #fff;
 }
 .panel-body {
-  min-height: 400px;
+  min-height: 350px;
   padding: 15px;
   background-color: #fff;
   border-radius: 0 0 4px 4px;
@@ -393,47 +529,53 @@ const formatDate = (date) => {
 }
 
 .divider {
-  border-top: 1px solid #e8e8e8;
   margin: 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: end;
 }
 
 .elegant-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 12px 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.table-h-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-row {
+  display: flex;
+}
+
+.table-header,
+.table-data {
+  flex: 1;
+  padding: 10px 12px;
+  text-align: left;
 }
 
 .table-header {
-  padding: 10px 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #1a1a1a;
-  border-bottom: 2px solid #e8e8e8;
+  font-weight: bold;
+  color: #333;
   font-size: 14px;
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
 }
 
 .table-data {
-  padding: 10px 12px;
   color: #333;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 13.5px;
-}
-
-.summary-text {
-  text-align: center;
-  font-size: 15px;
-  font-weight: 500;
-  color: #1a1a1a;
-  margin: 16px 0;
+  font-weight: bold;
+  font-size: 14px;
+  border-bottom: 2px solid #ddd;
 }
 
 .disclosure-text {
   text-align: center;
-  font-size: 12px;
-  color: #666;
-  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+  margin: 20px 0px;
 }
 
 /* Date range picker container */
@@ -450,27 +592,27 @@ const formatDate = (date) => {
 }
 
 /* Enhanced date picker styling */
-:deep(.elegant-date-picker) {
+::v-deep(.elegant-date-picker) {
   width: 150px !important;
   margin: 0px;
 }
 
-:deep(.elegant-date-picker .el-input__inner) {
+::v-deep(.elegant-date-picker .el-input__inner) {
   height: 36px;
   line-height: 36px;
   font-size: 12px;
   color: #333;
 }
 
-:deep(.el-input) {
+::v-deep(.el-input) {
   margin: 0px !important;
 }
 
-:deep(.elegant-date-picker .el-input__prefix-inner) {
+::v-deep(.elegant-date-picker .el-input__prefix-inner) {
   display: none !important;
 }
 
-:deep(.elegant-date-picker .el-input__wrapper) {
+::v-deep(.elegant-date-picker .el-input__wrapper) {
   width: 150px !important;
   box-shadow: none;
   border: 1px solid #d9d9d9;
@@ -480,12 +622,12 @@ const formatDate = (date) => {
   margin: 0px;
 }
 
-:deep(.elegant-date-picker .el-input__wrapper:hover) {
+::v-deep(.elegant-date-picker .el-input__wrapper:hover) {
   border-color: #409eff;
   background-color: #fff;
 }
 
-:deep(.elegant-date-picker .el-input__wrapper.is-focus) {
+::v-deep(.elegant-date-picker .el-input__wrapper.is-focus) {
   border-color: #409eff;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   background-color: #fff;
@@ -496,33 +638,33 @@ const formatDate = (date) => {
   margin-top: 12px;
 }
 
-:deep(.unpaid-checkbox-input .el-checkbox__inner) {
+::v-deep(.unpaid-checkbox-input .el-checkbox__inner) {
   border-color: gray;
   transition: none;
 }
 
-:deep(.unpaid-checkbox-input:not(.is-disabled) .el-checkbox__inner:hover) {
+::v-deep(.unpaid-checkbox-input:not(.is-disabled) .el-checkbox__inner:hover) {
   border-color: #000;
 }
 
-:deep(.unpaid-checkbox-input .el-checkbox__input.is-checked .el-checkbox__inner) {
+::v-deep(.unpaid-checkbox-input .el-checkbox__input.is-checked .el-checkbox__inner) {
   border-color: #000 !important;
   background-color: #333 !important;
 }
 
-:deep(.unpaid-checkbox-input .el-checkbox__label) {
+::v-deep(.unpaid-checkbox-input .el-checkbox__label) {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   color: #333333;
 }
 
-:deep(.unpaid-checkbox-input.is-disabled) {
+::v-deep(.unpaid-checkbox-input.is-disabled) {
   color: #999 !important;
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-:deep(.unpaid-checkbox-input.is-disabled .el-checkbox__label) {
+::v-deep(.unpaid-checkbox-input.is-disabled .el-checkbox__label) {
   color: #999 !important;
   cursor: not-allowed;
 }
