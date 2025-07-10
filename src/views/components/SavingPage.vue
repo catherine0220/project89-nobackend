@@ -100,11 +100,11 @@
 import { ref } from 'vue'
 import iconSaving from '@/assets/images/savingpage1.svg'
 import iconBank from '@/assets/images/savingpage2.svg'
-import iconOnline from '@/assets/images/savingpage1.svg'
-import iconVTPay from '@/assets/images/savingpage1.svg'
-import iconUSDT from '@/assets/images/savingpage1.svg'
-import iconMomo from '@/assets/images/savingpage1.svg'
-import iconCard from '@/assets/images/savingpage1.svg'
+import iconOnline from '@/assets/images/placeholder.png'
+import iconVTPay from '@/assets/images/placeholder.png'
+import iconUSDT from '@/assets/images/placeholder.png'
+import iconMomo from '@/assets/images/placeholder.png'
+import iconCard from '@/assets/images/placeholder.png'
 
 const activeMainTab = ref(0)
 const activeDetailTab = ref({ 0: null, 1: null })

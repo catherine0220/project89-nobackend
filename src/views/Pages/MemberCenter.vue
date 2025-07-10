@@ -275,6 +275,7 @@ function switchTab(tab) {
 function showSecurityTab() {
   securitySubPage.value = null
   activeTab.value = 'security'
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function showAnnouncement() {
