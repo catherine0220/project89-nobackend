@@ -258,9 +258,9 @@ const formattedNumber = computed(() => {
 // 模拟数字增长
 onMounted(() => {
   timer = setInterval(() => {
-    const increment = Math.random() * 10 // 0~10之间随机增长
+    const increment = Math.random() * 10
     number.value += increment
-  }, 1500) // 每2秒增长一次
+  }, 1200)
 })
 
 onUnmounted(() => {

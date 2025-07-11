@@ -21,13 +21,13 @@
         <div class="login-user-section flex items-center gap-1">
           <div class="login-user-info">
             <div class="login-info-label">账户:</div>
-            <div class="login-info-value">ID Name</div>
+            <div class="login-info-value">{{ displayInfo.name }}</div>
             <i class="fa fa-solid fa-message" @click="goTo('/membercenter#mail')"></i>
           </div>
           <div class="login-user-info">
             <div class="login-info-label">剩余:</div>
-            <div class="login-info-value">0</div>
-            <i class="fa-solid fa-arrows-rotate"></i>
+            <div class="login-info-value">{{ displayInfo.gold }}</div>
+            <i class="fa-solid fa-arrows-rotate" @click="refreshBalance"></i>
           </div>
           <button class="login-action-button" @click="goTo('/membercenter#deposit')">
             网上存款
@@ -116,20 +116,76 @@
 
 <script setup>
 import '@/assets/styles/main.css'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { ArrowDownBold } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import { useAuth } from '@/utils/auth'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
-const auth = useAuth()
 const router = useRouter()
 
 const goTo = (path) => {
   router.push(path)
 }
 
-const handleLogout = () => {
-  auth.logout()
+const auth = useAuthStore()
+const { user } = storeToRefs(auth) // 保持响应式
+
+onMounted(() => {
+  auth.initialize() // 初始化时检查登录状态
+})
+
+const displayInfo = computed(() => ({
+  name: user.value?.username || '未登录',
+  gold: user.value?.game_data?.gold ?? 0,
+}))
+
+const refreshBalance = async () => {
+  const savedUser = auth.user
+
+  // 如果用户未登录或未保存密码，提示登录
+  if (!savedUser?.username || !savedUser?.password) {
+    ElMessage.error('请先重新登录以刷新余额')
+    return
+  }
+
+  try {
+    const response = await axios.post(
+      'http://192.168.0.122/silver/user/user_login.php',
+      new URLSearchParams({
+        username: savedUser.username,
+        password: savedUser.password,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+
+    if (response.data.success) {
+      auth.login(response.data.data, savedUser.password) // 再次带上密码保存
+      ElMessage.success('余额刷新成功')
+      console.log('当前金币:', response.data.data.game_data.gold)
+    } else {
+      ElMessage.error(response.data.message || '刷新失败')
+    }
+  } catch (error) {
+    console.error('刷新失败:', error)
+    ElMessage.error(error.response?.data?.message || '刷新失败')
+  }
+}
+
+const handleLogout = async () => {
+  try {
+    await auth.logout()
+    // 登出成功后跳转到登录页或首页
+    router.push('/') // 或 '/home' 根据你的需求
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
 }
 
 const dropdownVisible = ref(false)
@@ -509,6 +565,7 @@ onBeforeUnmount(() => {
   @apply text-yellow-300;
   padding: 5px 10px;
   padding-left: 0px;
+  cursor: pointer;
 }
 
 .fa-door-open {

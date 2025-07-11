@@ -72,6 +72,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <div class="email-footer">
+      <div class="email-footer-cell">
+        <span v-show="allMailsLoaded && !mailListNull && mailList.length > 0">所有内容已下载</span>
+        <span v-show="allMailsLoaded && mailListNull">无数据</span>
+        <span v-show="!allMailsLoaded && loading">加载中...</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -80,19 +89,30 @@ import { ref, computed } from 'vue'
 
 // Email data
 const mailList = ref([
-  {
-    subject: '访问应用程序 1.1.1.1',
-    time: '2025-07-07T03:12:21',
-    read: false,
-    content: '这是关于访问应用程序1.1.1.1的详细信息。请按照说明操作以确保安全。',
-  },
-  {
-    subject: '神秘⾯奖金',
-    time: '2025-07-03T04:02:36',
-    read: true,
-    content: '恭喜您获得了神秘奖金！请点击下方链接领取您的奖励。如有疑问，请联系客服。',
-  },
+  // {
+  //   subject: '访问应用程序 1.1.1.1',
+  //   time: '2025-07-07T03:12:21',
+  //   read: false,
+  //   content: '这是关于访问应用程序1.1.1.1的详细信息。请按照说明操作以确保安全。',
+  // },
+  // {
+  //   subject: '神秘⾯奖金',
+  //   time: '2025-07-03T04:02:36',
+  //   read: true,
+  //   content: '恭喜您获得了神秘奖金！请点击下方链接领取您的奖励。如有疑问，请联系客服。',
+  // },
 ])
+
+const allMailsLoaded = ref(false)
+const mailListNull = ref(false)
+const loading = ref(true)
+
+// 模拟数据加载过程
+setTimeout(() => {
+  allMailsLoaded.value = true
+  loading.value = false
+  mailListNull.value = mailList.value.length === 0
+}, 1500)
 
 // Modal state
 const showModal = ref(false)
@@ -181,6 +201,17 @@ const markAsUnread = () => {
 </script>
 
 <style scoped>
+.email-footer-cell {
+  height: 20px;
+  font-size: 14px;
+  color: black;
+  padding: 8px;
+  text-align: center;
+  border-top: 1px solid #ddd;
+  background-color: #ebebeb;
+  margin-bottom: 20px;
+}
+
 .modal-body {
   padding: 24px;
   flex-grow: 1;

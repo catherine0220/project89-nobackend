@@ -15,10 +15,10 @@
         <div class="account-sidebar" v-if="!isSidebarHidden">
           <div class="account-header">
             <i class="fas fa-user-circle"></i>
-            <div class="account-id">帐户 CAT0216</div>
+            <div class="account-id">帐户： {{ user?.username || '未登录' }}</div>
             <div class="account-balance">
-              余额： 0
-              <i class="fa-solid fa-arrows-rotate"></i>
+              余额：{{ user?.game_data?.gold || '0' }}
+              <i class="fa-solid fa-arrows-rotate" @click="refreshBalance"></i>
             </div>
           </div>
 
@@ -189,6 +189,54 @@ import FavoritesPage from '@/views/components/FavoritesPage.vue'
 import ChangePassword from '@/views/components/ChangePassword.vue'
 import ChangeMoneyPassword from '@/views/components/ChangeMoneyPassword.vue'
 import NameSettings from '@/views/components/NameSettings.vue'
+
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
+
+const auth = useAuthStore()
+const { user } = storeToRefs(auth)
+
+onMounted(() => {
+  auth.initialize() // 确保初始化
+})
+
+const refreshBalance = async () => {
+  const savedUser = auth.user
+
+  // 如果用户未登录或未保存密码，提示登录
+  if (!savedUser?.username || !savedUser?.password) {
+    ElMessage.error('请先重新登录以刷新余额')
+    return
+  }
+
+  try {
+    const response = await axios.post(
+      'http://192.168.0.122/silver/user/user_login.php',
+      new URLSearchParams({
+        username: savedUser.username,
+        password: savedUser.password,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+
+    if (response.data.success) {
+      auth.login(response.data.data, savedUser.password) // 再次带上密码保存
+      ElMessage.success('余额刷新成功')
+      console.log('当前金币:', response.data.data.game_data.gold)
+    } else {
+      ElMessage.error(response.data.message || '刷新失败')
+    }
+  } catch (error) {
+    console.error('刷新失败:', error)
+    ElMessage.error(error.response?.data?.message || '刷新失败')
+  }
+}
 
 const activeTab = ref('deposit')
 const lastActiveTab = ref('deposit')
@@ -445,6 +493,7 @@ function returnToSecuritySettings() {
   @apply text-yellow-300;
   padding: 5px 10px;
   padding-left: 0px;
+  cursor: pointer;
 }
 
 .dynamic-content {

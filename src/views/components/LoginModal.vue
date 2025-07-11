@@ -67,11 +67,11 @@ import { ElMessage } from 'element-plus'
 import { getCaptcha } from '@/utils/captcha'
 import { login } from '@/api/auth'
 import { useRouter } from 'vue-router'
-import { useAuth } from '@/utils/auth'
+import { useAuthStore } from '@/stores/auth'
 
+const auth = useAuthStore()
 const emit = defineEmits(['close', 'login-success', 'show-register'])
 const router = useRouter()
-const auth = useAuth()
 
 const formRef = ref()
 const formData = reactive({
@@ -106,20 +106,23 @@ const refreshCaptcha = async () => {
 
 const handleSubmit = async () => {
   try {
-    await formRef.value.validate()
     loading.value = true
 
-    // 调用登录API
+    // 首先验证表单
+    await formRef.value.validate()
+
+    // 验证验证码
+    if (formData.captcha.toLowerCase() !== captchaText.value.toLowerCase()) {
+      throw new Error('验证码错误')
+    }
+
     const res = await login({
       username: formData.username,
       password: formData.password,
     })
 
     if (res.success) {
-      ElMessage.success(res.message || '登录成功')
-      // 存储用户信息到本地
-      localStorage.setItem('user', JSON.stringify(res.data))
-      auth.login(res.data)
+      auth.login(res.data, formData.password)
       emit('login-success', res.data)
       emit('close')
       router.push('/home')

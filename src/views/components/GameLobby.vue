@@ -850,6 +850,7 @@ onUnmounted(() => {
   transition: all 0.3s;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .lobby-item {

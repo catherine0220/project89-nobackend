@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="vip1">
-      <img :src="vip1" :alt="item.label" class="vip-img" />
+      <img :src="vipImage" :alt="item.label" class="vip-img" />
       <div class="vip-level">
         <h4>当前水平</h4>
         <h1>贵宾{{ currentLevel }}</h1>
@@ -70,35 +70,52 @@
 </template>
 
 <script setup>
-import vip1 from '@/assets/images/vip1.png'
+import { useAuthStore } from '@/stores/auth'
 import { computed } from 'vue'
+import vip0 from '@/assets/images/vip0.png'
+import vip1 from '@/assets/images/vip0.png'
+import vip2 from '@/assets/images/vip0.png'
+import vip3 from '@/assets/images/vip0.png'
+import vip4 from '@/assets/images/vip0.png'
 
-const currentLevel = 0
-const nextLevel = 1
-const currentPoints = 250 // Example value - connect to your data source
-const requiredPoints = 1000
+const auth = useAuthStore()
 
-const item = {
-  label: 'VIP 1',
-}
+const currentLevel = computed(() => auth.user?.vip_level || 0)
+const currentPoints = computed(() => auth.user?.game_data?.point || 0)
+const vipThresholds = [0, 1000, 3000, 6000, 10000, 20000] // 可按你系统定义调整
+
+const nextLevel = computed(() => {
+  return Math.min(currentLevel.value + 1, vipThresholds.length - 1)
+})
+
+const requiredPoints = computed(() => {
+  return vipThresholds[nextLevel.value] || 100000
+})
 
 const progressPercentage = computed(() => {
-  return `${Math.min((currentPoints / requiredPoints) * 100, 100)}%`
+  return `${Math.min((currentPoints.value / requiredPoints.value) * 100, 100)}%`
 })
 
 const formattedCurrentPoints = computed(() => {
-  return currentPoints.toLocaleString()
+  return currentPoints.value.toLocaleString()
 })
 
 const formattedRequiredPoints = computed(() => {
-  return requiredPoints.toLocaleString()
+  return requiredPoints.value.toLocaleString()
 })
 
 const formattedPointsNeeded = computed(() => {
-  return Math.max(requiredPoints - currentPoints, 0).toLocaleString()
+  return Math.max(requiredPoints.value - currentPoints.value, 0).toLocaleString()
 })
 
-const showProgressText = false // Set to false if you don't want to show percentage
+const showProgressText = false
+
+const item = computed(() => ({
+  label: `VIP ${currentLevel.value}`,
+}))
+
+const vipImages = [vip0, vip1, vip2, vip3, vip4]
+const vipImage = computed(() => vipImages[currentLevel.value] || vip0)
 </script>
 
 <style scoped>
