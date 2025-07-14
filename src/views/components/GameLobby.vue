@@ -50,72 +50,74 @@ how?:
         </ul>
       </div>
 
-      <div class="flex flex-col items-center justify-center">
+      <div class="flex flex-col items-center justify-center" ref="wrapperRef">
         <!-- 游戏介绍 -->
-        <h1 class="headline">
-          <span class="headline-title">游戏介绍</span>
-          <a :href="firstPlayUrl" target="_blank" class="more-games-button">
-            <el-icon><CaretRight /></el-icon> 更多游戏
-          </a>
-        </h1>
+        <div v-if="activeCategory === 1" class="flex flex-col items-center justify-center">
+          <h1 class="headline">
+            <span class="headline-title">游戏介绍</span>
+            <a :href="firstPlayUrl" target="_blank" class="more-games-button">
+              <el-icon><CaretRight /></el-icon> 更多游戏
+            </a>
+          </h1>
 
-        <div class="game-carousel-container">
-          <div class="carousel-wrapper" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
-            <button class="carousel-arrow left" @click="prevSlide">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
+          <div class="game-carousel-container">
+            <div class="carousel-wrapper" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
+              <button class="carousel-arrow left" @click="prevSlide">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
 
-            <div
-              class="carousel-slides"
-              :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
-            >
-              <div v-for="(group, index) in gameGroups" :key="index" class="game-row">
-                <div
-                  v-for="(game, gameIndex) in group"
-                  :key="gameIndex"
-                  class="game-carousel-container"
-                >
-                  <div class="game-card">
-                    <div class="game-header">
-                      <div class="logo-container">
-                        <img
-                          :src="game.image_url"
-                          :alt="game.name"
-                          class="gamelogo"
-                          @error="(e) => (e.target.src = placeholderImage)"
-                        />
-                        <div class="logo-overlay"></div>
-                        <a class="play-button" :href="game.url">PLAY</a>
+              <div
+                class="carousel-slides"
+                :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
+              >
+                <div v-for="(group, index) in gameGroups" :key="index" class="game-row">
+                  <div
+                    v-for="(game, gameIndex) in group"
+                    :key="gameIndex"
+                    class="game-carousel-container"
+                  >
+                    <div class="game-card">
+                      <div class="game-header">
+                        <div class="logo-container">
+                          <img
+                            :src="game.image_url"
+                            :alt="game.name"
+                            class="gamelogo"
+                            @error="(e) => (e.target.src = placeholderImage)"
+                          />
+                          <div class="logo-overlay"></div>
+                          <a class="play-button" :href="game.url">PLAY</a>
+                        </div>
+                        <div class="game-title-container">
+                          <h3 class="game-title">{{ game.name }}</h3>
+                          <i class="heart-icon fa-regular fa-heart"></i>
+                        </div>
+                        <span class="game-description">{{ game.description }}</span>
                       </div>
-                      <div class="game-title-container">
-                        <h3 class="game-title">{{ game.name }}</h3>
-                        <i class="heart-icon fa-regular fa-heart"></i>
-                      </div>
-                      <span class="game-description">{{ game.description }}</span>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <button class="carousel-arrow right" @click="nextSlide">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
             </div>
 
-            <button class="carousel-arrow right" @click="nextSlide">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
-
-          <div class="carousel-indicators">
-            <button
-              v-for="(group, index) in gameGroups"
-              :key="index"
-              class="indicator"
-              :class="{ active: currentIndex === index }"
-              @click="goToSlide(index)"
-            ></button>
+            <div class="carousel-indicators">
+              <button
+                v-for="(group, index) in gameGroups"
+                :key="index"
+                class="indicator"
+                :class="{ active: currentIndex === index }"
+                @click="goToSlide(index)"
+              ></button>
+            </div>
           </div>
         </div>
 
         <!-- 热门游戏 -->
-        <h1 class="headline">
+        <h1 class="headline" v-if="activeCategory === 1">
           <span class="headline-title">热门游戏</span>
           <a :href="firstPlayUrl" target="_blank" class="more-games-button">
             <el-icon><CaretRight /></el-icon> 更多游戏
@@ -185,30 +187,41 @@ how?:
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { CaretRight } from '@element-plus/icons-vue'
+import { ElLoading } from 'element-plus'
 import placeholderImage from '@/assets/images/placeholder.png'
 import axios from 'axios'
 
 const category19Games = ref([])
 const category7Games = ref([])
-const category8Games = ref([]) // Add category 8 games ref
+const category8Games = ref([])
+
 const activeLobbyName = ref('Pg电子')
+const wrapperRef = ref(null)
 
 const firstPlayUrl = computed(() => {
   return category7Games.value.length > 0 ? category7Games.value[0].url : '#'
 })
 
-// Fetch category 19 games
+// 🟡 后端 category ID 对应配置
+const categories = ref([
+  { id: 1, name: '最热游戏', backend: [8, 9] },
+  { id: 2, name: '所有游戏', backend: [21] },
+  { id: 3, name: '最新游戏', backend: [22] },
+  { id: 4, name: '电子游戏', backend: [23] },
+  { id: 5, name: '其他游戏', backend: [24] },
+])
+
+const activeCategory = ref(1)
+const showGameIntro = ref(true)
+
 const fetchCategory19Games = async () => {
   try {
-    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
-      params: {
-        category: 19,
-        status: 1,
-      },
+    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: { category: 19, status: 1 },
     })
 
-    if (response.data.success) {
-      const processedGames = response.data.data
+    if (res.data.success) {
+      const games = res.data.data
         .map((game) => ({
           name: game.game_name || game.name,
           image_url: game.image_url
@@ -218,74 +231,78 @@ const fetchCategory19Games = async () => {
         }))
         .reverse()
 
-      category19Games.value = processedGames
-
-      const pgGame = processedGames.find((game) => game.name.includes('Pg电子'))
-      if (pgGame) {
-        activeLobbyName.value = pgGame.name
-      } else if (processedGames.length > 0) {
-        activeLobbyName.value = processedGames[0].name
-      }
+      category19Games.value = games
+      const pg = games.find((g) => g.name.includes('Pg电子'))
+      activeLobbyName.value = pg ? pg.name : games[0]?.name || 'Pg电子'
     }
-  } catch (error) {
-    console.error('Error fetching category 19 games:', error)
-    category19Games.value = []
+  } catch (err) {
+    console.error('加载 category 19 失败', err)
   }
 }
 
-// Fetch category 7 games
-const fetchCategory7Games = async () => {
+const fetchGamesByCategory = async (categoryId) => {
   try {
-    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
-      params: {
-        category: 7,
-        status: 1,
-      },
+    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: { category: categoryId, status: 1 },
     })
 
-    if (response.data.success) {
-      category7Games.value = response.data.data.map((game) => ({
+    if (res.data.success) {
+      return res.data.data.map((game) => ({
         name: game.game_name || game.name,
         image_url: game.image_url
           ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
           : placeholderImage,
         description: game.description || '暂无描述',
         path: game.path || '#',
-        url: `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`,
+        url: game.url
+          ? `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+          : '#',
       }))
     }
-  } catch (error) {
-    console.error('Error fetching category 7 games:', error)
-    category7Games.value = []
+  } catch (err) {
+    console.error(`加载 category ${categoryId} 失败`, err)
   }
+  return []
 }
 
-// Add function to fetch category 8 games
-const fetchCategory8Games = async () => {
-  try {
-    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
-      params: {
-        category: 8,
-        status: 1,
-      },
+const selectCategory = async (id) => {
+  activeCategory.value = id
+  showGameIntro.value = id === 1
+
+  let loading = null
+  if (wrapperRef.value) {
+    loading = ElLoading.service({
+      target: wrapperRef.value,
+      text: '加载中...',
+      background: 'rgba(255,255,255,0.8)',
     })
+  }
 
-    if (response.data.success) {
-      category8Games.value = response.data.data.map((game) => ({
-        name: game.game_name || game.name,
-        image_url: game.image_url
-          ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-          : placeholderImage,
-        path: game.path || '#',
-        url: `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`,
-      }))
+  try {
+    const selected = categories.value.find((cat) => cat.id === id)
+    if (!selected) return
+
+    if (id === 1) {
+      const list7 = await fetchGamesByCategory(7)
+      const list8 = await fetchGamesByCategory(8)
+      category7Games.value = list7
+      category8Games.value = list8
+    } else {
+      let results = []
+      for (const realId of selected.backend) {
+        const list = await fetchGamesByCategory(realId)
+        results.push(...list)
+      }
+      category8Games.value = results
     }
-  } catch (error) {
-    console.error('Error fetching category 8 games:', error)
-    category8Games.value = []
+  } catch (err) {
+    console.error('分类加载失败', err)
+  } finally {
+    loading?.close()
   }
 }
 
+// ➤ 点击游戏进入
 const navigateToGame = (path, index, name) => {
   activeLobbyName.value = name
   if (path && path !== '#') {
@@ -293,52 +310,20 @@ const navigateToGame = (path, index, name) => {
   }
 }
 
-// Navigation categories
-const categories = ref([
-  { id: 1, name: '最热游戏' },
-  { id: 2, name: '所有游戏' },
-  { id: 3, name: '最新游戏' },
-  { id: 4, name: '电子游戏' },
-  { id: 5, name: '其他游戏' },
-])
-
-const activeCategory = ref(1)
-
-const selectCategory = (id) => {
-  activeCategory.value = id
-}
-
-// Hot games pagination (now using category8Games)
+// 热门游戏分页
 const currentHotPage = ref(1)
 const gamesPerPage = 10
 const totalHotPages = computed(() => Math.ceil(category8Games.value.length / gamesPerPage))
 const visibleHotGames = computed(() => {
   const start = (currentHotPage.value - 1) * gamesPerPage
-  const end = start + gamesPerPage
-  return category8Games.value.slice(start, end)
+  return category8Games.value.slice(start, start + gamesPerPage)
 })
+const nextHotPage = () => currentHotPage.value++
+const prevHotPage = () => currentHotPage.value--
+const goToFirstPage = () => (currentHotPage.value = 1)
+const goToLastPage = () => (currentHotPage.value = totalHotPages.value)
 
-const nextHotPage = () => {
-  if (currentHotPage.value < totalHotPages.value) {
-    currentHotPage.value++
-  }
-}
-
-const prevHotPage = () => {
-  if (currentHotPage.value > 1) {
-    currentHotPage.value--
-  }
-}
-
-const goToFirstPage = () => {
-  currentHotPage.value = 1
-}
-
-const goToLastPage = () => {
-  currentHotPage.value = totalHotPages.value
-}
-
-// Carousel logic for 游戏介绍
+// 游戏介绍轮播图
 const gameGroups = ref([])
 const currentIndex = ref(0)
 let autoPlayInterval = null
@@ -350,10 +335,7 @@ const initGroups = () => {
   }
   gameGroups.value = groups
 }
-
-watch(category7Games, () => {
-  initGroups()
-})
+watch(category7Games, initGroups)
 
 const nextSlide = () => {
   if (gameGroups.value.length > 0) {
@@ -361,7 +343,6 @@ const nextSlide = () => {
     resetAutoPlay()
   }
 }
-
 const prevSlide = () => {
   if (gameGroups.value.length > 0) {
     currentIndex.value =
@@ -369,7 +350,6 @@ const prevSlide = () => {
     resetAutoPlay()
   }
 }
-
 const goToSlide = (index) => {
   if (index >= 0 && index < gameGroups.value.length) {
     currentIndex.value = index
@@ -380,39 +360,29 @@ const goToSlide = (index) => {
 const startAutoPlay = () => {
   stopAutoPlay()
   if (gameGroups.value.length > 1) {
-    autoPlayInterval = setInterval(() => {
-      nextSlide()
-    }, 5000)
+    autoPlayInterval = setInterval(() => nextSlide(), 5000)
   }
 }
-
 const stopAutoPlay = () => {
   if (autoPlayInterval) {
     clearInterval(autoPlayInterval)
     autoPlayInterval = null
   }
 }
-
 const resetAutoPlay = () => {
   stopAutoPlay()
   startAutoPlay()
 }
 
-// Lifecycle hooks
 onMounted(() => {
   fetchCategory19Games()
-  fetchCategory7Games()
-  fetchCategory8Games() // Fetch category 8 games on mount
+  selectCategory(1)
   startAutoPlay()
 })
-
-onUnmounted(() => {
-  stopAutoPlay()
-})
+onUnmounted(() => stopAutoPlay())
 </script>
 
 <style scoped>
-/* game */
 .more-games-button {
   color: #000;
   font-size: 15px;

@@ -69,7 +69,6 @@ import { login } from '@/api/auth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useModalStore } from '@/stores/modal'
-
 const modalStore = useModalStore()
 const auth = useAuthStore()
 const emit = defineEmits(['close', 'login-success', 'show-register'])
@@ -130,7 +129,7 @@ const handleSubmit = async () => {
       emit('close')
 
       const modalStore = useModalStore()
-      const redirectTo = modalStore.afterLoginRedirect || '/home'
+      const redirectTo = modalStore.redirectPath || '/home'
       modalStore.clearRedirectPath()
       router.push(redirectTo)
     } else {

@@ -181,10 +181,8 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  // 滚动行为控制
   scrollBehavior(to, from, savedPosition) {
-    // 总是返回顶部
-    return { top: 0 }
+    return savedPosition || { top: 0 }
   },
 })
 
