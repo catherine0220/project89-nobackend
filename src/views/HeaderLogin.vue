@@ -83,11 +83,11 @@
               :to="item.path || '#'"
               class="login-nav-link flex flex-col items-center justify-center gap-1 no-underline"
             >
-              <img
-                src="@/assets/images/placeholder.png"
-                :alt="item.label"
-                class="login-nav-icon w-[25px] h-[25px] rounded-full"
-              />
+              <div
+                class="nav-icon"
+                :class="{ active: activeIndex === index }"
+                :style="{ backgroundImage: `url(${item.image_url || fallbackImageUrl})` }"
+              ></div>
               <span>{{ item.label }}</span>
             </router-link>
 
@@ -123,7 +123,10 @@ import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
+import fallbackImage from '@/assets/images/placeholder.png'
 
+const menuItems = ref([])
+const fallbackImageUrl = new URL(fallbackImage, import.meta.url).href
 const router = useRouter()
 
 const goTo = (path) => {
@@ -131,10 +134,10 @@ const goTo = (path) => {
 }
 
 const auth = useAuthStore()
-const { user } = storeToRefs(auth) // 保持响应式
+const { user } = storeToRefs(auth)
 
 onMounted(() => {
-  auth.initialize() // 初始化时检查登录状态
+  auth.initialize()
 })
 
 const displayInfo = computed(() => ({
@@ -166,7 +169,7 @@ const refreshBalance = async () => {
     )
 
     if (response.data.success) {
-      auth.login(response.data.data, savedUser.password) // 再次带上密码保存
+      auth.login(response.data.data, savedUser.password)
       ElMessage.success('余额刷新成功')
       console.log('当前金币:', response.data.data.game_data.gold)
     } else {
@@ -207,10 +210,11 @@ const handleMouseLeave = () => {
   }, 300)
 }
 
-const menuItems = [
+const defaultMenuItems = [
   {
     label: '主页',
-    path: '/home',
+    path: '/',
+    children: null,
   },
   {
     label: '爆炸罐',
@@ -280,20 +284,67 @@ const menuItems = [
   {
     label: '晋升',
     path: '/promotions',
+    children: null,
   },
   {
     label: '应用程序',
     path: '/downloadapp',
+    children: null,
   },
   {
     label: '代理',
     path: '/agents',
+    children: null,
   },
   {
     label: '客服服务 24/7',
     path: '/support',
+    children: null,
   },
 ]
+
+// 获取后端菜单
+const fetchMenuItems = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 18,
+        status: 1,
+      },
+    })
+
+    const backendData = response.data.success ? response.data.data : []
+
+    // 🧠 把后端数据转成 Map 方便匹配
+    const backendMap = new Map(backendData.map((item) => [item.game_name || item.name, item]))
+
+    // ✅ 按 defaultMenuItems 顺序构建最终菜单
+    menuItems.value = defaultMenuItems.map((defaultItem) => {
+      const backendItem = backendMap.get(defaultItem.label)
+
+      return {
+        label: defaultItem.label,
+        path: defaultItem.path,
+        children: defaultItem.children || null,
+        image_url:
+          backendItem && backendItem.image_url
+            ? `http://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+            : fallbackImageUrl,
+      }
+    })
+  } catch (error) {
+    console.error('❌ 获取菜单失败:', error)
+    // fallback
+    menuItems.value = defaultMenuItems.map((item) => ({
+      ...item,
+      image_url: fallbackImageUrl,
+    }))
+  }
+}
+
+onMounted(() => {
+  fetchMenuItems()
+})
 
 const updateVietnamTime = () => {
   const now = new Date()
@@ -329,6 +380,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
+.nav-icon {
+  height: 30px;
+  width: 30px;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: top;
+  border-radius: 9999px;
+}
+
+.nav-icon.active {
+  background-position: bottom;
+}
+
 .login-logout-button {
   display: flex;
   align-items: center;
@@ -508,6 +572,10 @@ onBeforeUnmount(() => {
 
 .login-main-navigation {
   height: 72px;
+  background-color: #363636;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .login-nav-link {

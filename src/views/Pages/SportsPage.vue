@@ -13,27 +13,23 @@
     <div class="sportspage-container">
       <div class="sportspage-wrapper">
         <el-row :gutter="20">
-          <el-col :span="8" v-for="(img, index) in 3" :key="index" class="image-box">
-            <div class="image-wrapper">
-              <p class="intro">足球</p>
-              <img src="@/assets/images/sports1.png" class="sportspage-img" />
-              <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
-            </div>
-          </el-col>
-
-          <el-col :span="8" v-for="(img, index) in 3" :key="index" class="image-box">
-            <div class="image-wrapper">
-              <p class="intro">足球</p>
-              <img src="@/assets/images/sports1.png" class="sportspage-img" />
-              <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
-            </div>
-          </el-col>
-
-          <el-col :span="8" v-for="(img, index) in 3" :key="index" class="image-box">
-            <div class="image-wrapper">
-              <p class="intro">足球</p>
-              <img src="@/assets/images/sports1.png" class="sportspage-img" />
-              <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
+          <el-col :span="8" v-for="(game, index) in category20Games" :key="index" class="image-box">
+            <div class="image-wrapper" @click="navigateToGame(game.url)">
+              <p class="intro">{{ game.name }}</p>
+              <img
+                :src="game.image_url"
+                :alt="game.name"
+                class="sportspage-img"
+                @error="(e) => (e.target.src = placeholderImage)"
+              />
+              <el-button
+                class="img-button"
+                type="primary"
+                size="small"
+                @click.stop="navigateToGame(game.url)"
+              >
+                进入游戏
+              </el-button>
             </div>
           </el-col>
         </el-row>
@@ -46,17 +42,51 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '../FooterMain.vue'
-// import { useRouter } from 'vue-router'
-// const router = useRouter()
+import axios from 'axios'
+import placeholderImage from '@/assets/images/placeholder.png'
 
-// function goToGame(index) {
-//   // 根据 index 跳转不同页面
-//   const paths = ['/casino/baccarat', '/casino/roulette', '/casino/blackjack']
-//   router.push(paths[index])
-// }
+const category20Games = ref([])
+
+// Fetch category 20 games
+const fetchCategory20Games = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 20,
+        status: 1,
+      },
+    })
+
+    if (response.data.success) {
+      category20Games.value = response.data.data
+        .map((game) => ({
+          name: game.game_name || game.name,
+          image_url: game.image_url
+            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            : placeholderImage,
+          url: game.url || '#',
+        }))
+        .reverse()
+    }
+  } catch (error) {
+    console.error('Error fetching category 20 games:', error)
+    category20Games.value = []
+  }
+}
+
+const navigateToGame = (url) => {
+  if (url && url !== '#') {
+    window.location.href = url
+  }
+}
+
+onMounted(() => {
+  fetchCategory20Games()
+})
 </script>
 
 <style scoped>

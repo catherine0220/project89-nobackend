@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <HeaderMain />
+    <DynamicHeader />
 
     <!-- Banner -->
     <div class="flex justify-center">
@@ -44,7 +44,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import HeaderMain from '@/views/HeaderMain.vue'
+import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
 import CommissionView from '../components/CommissionView.vue'

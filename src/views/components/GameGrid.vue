@@ -94,7 +94,9 @@ import RegisterModal from '@/views/components/RegisterModal.vue'
 import bgImg from '@/assets/images/gamegrid/slotgamebg.jpg'
 import axios from 'axios'
 import fallbackImage from '@/assets/images/placeholder.png'
+import LoginModal from '@/views/components/LoginModal.vue'
 
+const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
 const hoveredIndex = ref(null)
 const backendGames = ref([])
@@ -126,8 +128,6 @@ const fetchData = async () => {
     if (tabResponse.data.success) {
       const rawTabs = tabResponse.data.data
 
-      // 如果是倒序就加 reverse()，否则可按 ID 升序排序
-      // rawTabs.reverse() // 简单倒转
       rawTabs.sort((a, b) => a.id - b.id) // 如果后端数据有 ID，可以用这个方式排序
 
       tabList.value = rawTabs.map((tab) => ({
@@ -295,6 +295,7 @@ onMounted(() => {
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .slot-game {

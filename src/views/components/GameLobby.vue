@@ -1,11 +1,22 @@
+how?:
 <template>
   <div class="lobby-container">
     <div class="lobby-wrapper">
       <ul class="lobby-list">
-        <li v-for="(game, index) in electronicGames" :key="index" class="lobby-item">
-          <div class="lobby-card">
-            <img :src="gameImages[game] || placeholderImage" :alt="game" class="lobby-image" />
-            <div class="lobby-title">{{ game }}</div>
+        <li v-for="(game, index) in category19Games" :key="index" class="lobby-item">
+          <div
+            class="lobby-card"
+            :class="{ active: activeLobbyName === game.name }"
+            @click="navigateToGame(game.path, index, game.name)"
+          >
+            <!-- 加在这里！ -->
+            <img
+              class="lobby-image"
+              :src="game.image_url"
+              :alt="game.name"
+              @error="(e) => (e.target.src = placeholderImage)"
+            />
+            <div class="lobby-title">{{ game.name }}</div>
           </div>
         </li>
       </ul>
@@ -43,9 +54,9 @@
         <!-- 游戏介绍 -->
         <h1 class="headline">
           <span class="headline-title">游戏介绍</span>
-          <router-link to="/more-games" class="more-games-button">
+          <a :href="firstPlayUrl" target="_blank" class="more-games-button">
             <el-icon><CaretRight /></el-icon> 更多游戏
-          </router-link>
+          </a>
         </h1>
 
         <div class="game-carousel-container">
@@ -67,15 +78,20 @@
                   <div class="game-card">
                     <div class="game-header">
                       <div class="logo-container">
-                        <img src="@/assets/images/gamelobby.gif" alt="gamelogo" class="gamelogo" />
+                        <img
+                          :src="game.image_url"
+                          :alt="game.name"
+                          class="gamelogo"
+                          @error="(e) => (e.target.src = placeholderImage)"
+                        />
                         <div class="logo-overlay"></div>
-                        <button class="play-button">PLAY</button>
+                        <a class="play-button" :href="game.url">PLAY</a>
                       </div>
                       <div class="game-title-container">
                         <h3 class="game-title">{{ game.name }}</h3>
                         <i class="heart-icon fa-regular fa-heart"></i>
                       </div>
-                      <span class="game-code">{{ game.code }}</span>
+                      <span class="game-description">{{ game.description }}</span>
                     </div>
                   </div>
                 </div>
@@ -101,9 +117,9 @@
         <!-- 热门游戏 -->
         <h1 class="headline">
           <span class="headline-title">热门游戏</span>
-          <router-link to="/more-games" class="more-games-button">
+          <a :href="firstPlayUrl" target="_blank" class="more-games-button">
             <el-icon><CaretRight /></el-icon> 更多游戏
-          </router-link>
+          </a>
         </h1>
 
         <div class="game-grid-container">
@@ -111,9 +127,14 @@
             <div v-for="(game, gameIndex) in visibleHotGames" :key="gameIndex" class="game-card2">
               <div class="game-header">
                 <div class="logo-container">
-                  <img src="@/assets/images/gamelobby1.png" alt="gamelogo" class="gamelogo2" />
+                  <img
+                    :src="game.image_url"
+                    :alt="game.name"
+                    class="gamelogo2"
+                    @error="(e) => (e.target.src = placeholderImage)"
+                  />
                   <div class="logo-overlay"></div>
-                  <button class="play-button">PLAY</button>
+                  <a class="play-button" :href="game.url">PLAY</a>
                 </div>
                 <div class="game-title-container">
                   <h3 class="game-title2">{{ game.name }}</h3>
@@ -162,23 +183,117 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { CaretRight } from '@element-plus/icons-vue'
 import placeholderImage from '@/assets/images/placeholder.png'
+import axios from 'axios'
 
-// 静态导入所有游戏图片
-import pcImage from '@/assets/images/placeholder.png'
-import jiliImage from '@/assets/images/placeholder.png'
+const category19Games = ref([])
+const category7Games = ref([])
+const category8Games = ref([]) // Add category 8 games ref
+const activeLobbyName = ref('Pg电子')
 
-const electronicGames = ['PC 电子', '吉利电子', 'FG 电子', 'PC 电子', '吉利电子', 'FG 电子']
+const firstPlayUrl = computed(() => {
+  return category7Games.value.length > 0 ? category7Games.value[0].url : '#'
+})
 
-// 游戏图片映射
-const gameImages = {
-  'PC 电子': pcImage,
-  吉利电子: jiliImage,
+// Fetch category 19 games
+const fetchCategory19Games = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 19,
+        status: 1,
+      },
+    })
+
+    if (response.data.success) {
+      const processedGames = response.data.data
+        .map((game) => ({
+          name: game.game_name || game.name,
+          image_url: game.image_url
+            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            : placeholderImage,
+          path: game.path || '#',
+        }))
+        .reverse()
+
+      category19Games.value = processedGames
+
+      const pgGame = processedGames.find((game) => game.name.includes('Pg电子'))
+      if (pgGame) {
+        activeLobbyName.value = pgGame.name
+      } else if (processedGames.length > 0) {
+        activeLobbyName.value = processedGames[0].name
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching category 19 games:', error)
+    category19Games.value = []
+  }
 }
 
-// nav
+// Fetch category 7 games
+const fetchCategory7Games = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 7,
+        status: 1,
+      },
+    })
+
+    if (response.data.success) {
+      category7Games.value = response.data.data.map((game) => ({
+        name: game.game_name || game.name,
+        image_url: game.image_url
+          ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+          : placeholderImage,
+        description: game.description || '暂无描述',
+        path: game.path || '#',
+        url: `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`,
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching category 7 games:', error)
+    category7Games.value = []
+  }
+}
+
+// Add function to fetch category 8 games
+const fetchCategory8Games = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 8,
+        status: 1,
+      },
+    })
+
+    if (response.data.success) {
+      category8Games.value = response.data.data.map((game) => ({
+        name: game.game_name || game.name,
+        image_url: game.image_url
+          ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+          : placeholderImage,
+        path: game.path || '#',
+        url: `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`,
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching category 8 games:', error)
+    category8Games.value = []
+  }
+}
+
+const navigateToGame = (path, index, name) => {
+  activeLobbyName.value = name
+  if (path && path !== '#') {
+    window.location.href = path
+  }
+}
+
+// Navigation categories
 const categories = ref([
   { id: 1, name: '最热游戏' },
   { id: 2, name: '所有游戏' },
@@ -189,162 +304,18 @@ const categories = ref([
 
 const activeCategory = ref(1)
 
-// 方法
 const selectCategory = (id) => {
   activeCategory.value = id
 }
 
-// Game data
-const games = ref([
-  {
-    name: 'Gigi Thieu Trò Chơi',
-    code: 'MAYA 5',
-    description: 'Thành phố vàng Maya 5',
-    tags: ['CODE (GT)', 'YGR'],
-  },
-  {
-    name: 'METT TONK',
-    code: 'SELF-POWER',
-    description: 'Tự Rút Mạt Chư ợc 3',
-    tags: ['INFLUENCE', 'VA'],
-  },
-  {
-    name: 'Natural Ace',
-    code: 'Askine',
-    description: 'AMA',
-    tags: ['CODE (GT)'],
-  },
-  {
-    name: 'Thành phố vàng Maya 4',
-    code: 'YGR',
-    description: 'Huyền thoại Inca',
-    tags: ['LEGEND', 'OBITNESS', 'FC'],
-  },
-  {
-    name: 'Gigi Thieu Trò Chơi',
-    code: 'MAYA 5',
-    description: 'Thành phố vàng Maya 5',
-    tags: ['CODE (GT)', 'YGR'],
-  },
-  {
-    name: 'METT TONK',
-    code: 'SELF-POWER',
-    description: 'Tự Rút Mạt Chư ợc 3',
-    tags: ['INFLUENCE', 'VA'],
-  },
-  {
-    name: 'Natural Ace',
-    code: 'Askine',
-    description: 'AMA',
-    tags: ['CODE (GT)'],
-  },
-  {
-    name: 'Thành phố vàng Maya 4',
-    code: 'YGR',
-    description: 'Huyền thoại Inca',
-    tags: ['LEGEND', 'OBITNESS', 'FC'],
-  },
-  {
-    name: 'Game 9',
-    code: 'CODE9',
-    description: 'Description 9',
-    tags: ['TAG1', 'TAG2'],
-  },
-  {
-    name: 'Game 10',
-    code: 'CODE10',
-    description: 'Description 10',
-    tags: ['TAG1', 'TAG2'],
-  },
-])
-
-// Hot games data (for the grid)
-const hotGames = ref([
-  {
-    name: 'Hot Game 1',
-    description: 'Popular game 1',
-    tags: ['HOT', 'NEW'],
-  },
-  {
-    name: 'Hot Game 2',
-    description: 'Popular game 2',
-    tags: ['HOT', 'TRENDING'],
-  },
-  {
-    name: 'Hot Game 3',
-    description: 'Popular game 3',
-    tags: ['HOT', 'FEATURED'],
-  },
-  {
-    name: 'Hot Game 4',
-    description: 'Popular game 4',
-    tags: ['HOT', 'NEW'],
-  },
-  {
-    name: 'Hot Game 5',
-    description: 'Popular game 5',
-    tags: ['HOT', 'TRENDING'],
-  },
-  {
-    name: 'Hot Game 6',
-    description: 'Popular game 6',
-    tags: ['HOT', 'FEATURED'],
-  },
-  {
-    name: 'Hot Game 7',
-    description: 'Popular game 7',
-    tags: ['HOT', 'NEW'],
-  },
-  {
-    name: 'Hot Game 8',
-    description: 'Popular game 8',
-    tags: ['HOT', 'TRENDING'],
-  },
-  {
-    name: 'Hot Game 9',
-    description: 'Popular game 9',
-    tags: ['HOT', 'FEATURED'],
-  },
-  {
-    name: 'Hot Game 10',
-    description: 'Popular game 10',
-    tags: ['HOT', 'NEW'],
-  },
-  {
-    name: 'Hot Game 11',
-    description: 'Popular game 11',
-    tags: ['HOT', 'TRENDING'],
-  },
-  {
-    name: 'Hot Game 12',
-    description: 'Popular game 12',
-    tags: ['HOT', 'FEATURED'],
-  },
-  {
-    name: 'Hot Game 13',
-    description: 'Popular game 13',
-    tags: ['HOT', 'NEW'],
-  },
-  {
-    name: 'Hot Game 14',
-    description: 'Popular game 14',
-    tags: ['HOT', 'TRENDING'],
-  },
-  {
-    name: 'Hot Game 15',
-    description: 'Popular game 15',
-    tags: ['HOT', 'FEATURED'],
-  },
-])
-
-// Hot games pagination
+// Hot games pagination (now using category8Games)
 const currentHotPage = ref(1)
 const gamesPerPage = 10
-const totalHotPages = computed(() => Math.ceil(hotGames.value.length / gamesPerPage))
+const totalHotPages = computed(() => Math.ceil(category8Games.value.length / gamesPerPage))
 const visibleHotGames = computed(() => {
   const start = (currentHotPage.value - 1) * gamesPerPage
   const end = start + gamesPerPage
-  return hotGames.value.slice(start, end)
+  return category8Games.value.slice(start, end)
 })
 
 const nextHotPage = () => {
@@ -372,37 +343,47 @@ const gameGroups = ref([])
 const currentIndex = ref(0)
 let autoPlayInterval = null
 
-// Initialize groups
 const initGroups = () => {
   const groups = []
-  for (let i = 0; i < games.value.length; i += 5) {
-    groups.push(games.value.slice(i, i + 5))
+  for (let i = 0; i < category7Games.value.length; i += 5) {
+    groups.push(category7Games.value.slice(i, i + 5))
   }
   gameGroups.value = groups
 }
 
-// Navigation methods
+watch(category7Games, () => {
+  initGroups()
+})
+
 const nextSlide = () => {
-  currentIndex.value = (currentIndex.value + 1) % gameGroups.value.length
-  resetAutoPlay()
+  if (gameGroups.value.length > 0) {
+    currentIndex.value = (currentIndex.value + 1) % gameGroups.value.length
+    resetAutoPlay()
+  }
 }
 
 const prevSlide = () => {
-  currentIndex.value = (currentIndex.value - 1 + gameGroups.value.length) % gameGroups.value.length
-  resetAutoPlay()
+  if (gameGroups.value.length > 0) {
+    currentIndex.value =
+      (currentIndex.value - 1 + gameGroups.value.length) % gameGroups.value.length
+    resetAutoPlay()
+  }
 }
 
 const goToSlide = (index) => {
-  currentIndex.value = index
-  resetAutoPlay()
+  if (index >= 0 && index < gameGroups.value.length) {
+    currentIndex.value = index
+    resetAutoPlay()
+  }
 }
 
-// Auto-play control
 const startAutoPlay = () => {
   stopAutoPlay()
-  autoPlayInterval = setInterval(() => {
-    nextSlide()
-  }, 5000)
+  if (gameGroups.value.length > 1) {
+    autoPlayInterval = setInterval(() => {
+      nextSlide()
+    }, 5000)
+  }
 }
 
 const stopAutoPlay = () => {
@@ -419,7 +400,9 @@ const resetAutoPlay = () => {
 
 // Lifecycle hooks
 onMounted(() => {
-  initGroups()
+  fetchCategory19Games()
+  fetchCategory7Games()
+  fetchCategory8Games() // Fetch category 8 games on mount
   startAutoPlay()
 })
 
@@ -591,6 +574,10 @@ onUnmounted(() => {
   opacity: 0;
   z-index: 2;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 /* 悬停效果 */
@@ -648,7 +635,7 @@ onUnmounted(() => {
   width: 110px;
 }
 
-.game-code {
+.game-description {
   border: 0;
   color: #bfbfbf;
   margin: 0;
@@ -850,6 +837,7 @@ onUnmounted(() => {
   transition: all 0.3s;
   display: flex;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
@@ -858,13 +846,15 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.lobby-card:hover {
+.lobby-card:hover,
+.lobby-card.active {
   background: #ffd630;
 }
 
 .lobby-image {
   width: 60px;
   height: 40px;
+  margin-right: 25px;
   object-fit: contain;
 }
 

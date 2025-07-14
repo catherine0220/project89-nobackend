@@ -14,9 +14,19 @@
       <div class="image-gallery">
         <!-- 图片展示区域 -->
         <el-row :gutter="20">
-          <el-col v-for="(image, index) in imageList" :key="index" :span="12" :offset="0">
+          <el-col
+            v-for="(promo, index) in category3Promotions"
+            :key="index"
+            :span="12"
+            :offset="0"
+            @click="navigateToPromo(promo.url)"
+          >
             <el-card :body-style="{ padding: '0px' }">
-              <img :src="image.url" class="image-item" />
+              <img
+                :src="promo.image_url"
+                class="image-item"
+                @error="(e) => (e.target.src = placeholderImage)"
+              />
             </el-card>
           </el-col>
         </el-row>
@@ -29,18 +39,50 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
-import { ref } from 'vue'
+import axios from 'axios'
+import placeholderImage from '@/assets/images/placeholder.png'
 
-const imageList = ref([
-  { url: new URL('@/assets/images/promo1.png', import.meta.url).href },
-  { url: new URL('@/assets/images/promo1.png', import.meta.url).href },
-  { url: new URL('@/assets/images/promo1.png', import.meta.url).href },
-  { url: new URL('@/assets/images/promo1.png', import.meta.url).href },
-  { url: new URL('@/assets/images/promo1.png', import.meta.url).href },
-])
+const category3Promotions = ref([])
+
+// Fetch category 3 promotions
+const fetchCategory3Promotions = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 3,
+        status: 1,
+      },
+    })
+
+    if (response.data.success) {
+      category3Promotions.value = response.data.data
+        .map((promo) => ({
+          image_url: promo.image_url
+            ? `http://192.168.0.122${promo.image_url.startsWith('/') ? '' : '/'}${promo.image_url}`
+            : placeholderImage,
+          url: promo.url || '#',
+        }))
+        .reverse()
+    }
+  } catch (error) {
+    console.error('Error fetching category 3 promotions:', error)
+    category3Promotions.value = []
+  }
+}
+
+const navigateToPromo = (url) => {
+  if (url && url !== '#') {
+    window.location.href = url
+  }
+}
+
+onMounted(() => {
+  fetchCategory3Promotions()
+})
 </script>
 
 <style scoped>
@@ -64,9 +106,9 @@ const imageList = ref([
 
 .el-col {
   margin-bottom: 20px;
+  cursor: pointer;
 }
 
-/* 响应式设计 - 在小屏幕上显示1列 */
 @media (max-width: 768px) {
   .el-col {
     width: 100% !important;

@@ -58,11 +58,12 @@
               :to="item.path || '#'"
               class="nav flex flex-col items-center justify-center gap-1 no-underline"
             >
-              <img
-                src="@/assets/images/placeholder.png"
-                :alt="item.label"
-                class="w-[25px] h-[25px] rounded-full"
-              />
+              <div
+                class="nav-icon"
+                :class="{ active: activeIndex === index }"
+                :style="{ backgroundImage: `url(${item.image_url || fallbackImageUrl})` }"
+              ></div>
+
               <span>{{ item.label }}</span>
             </router-link>
 
@@ -96,17 +97,13 @@ import LoginModal from '@/views/components/LoginModal.vue'
 import ExpModal from '@/views/components/ExpModal.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useAuth } from '@/utils/auth'
+import axios from 'axios'
+import fallbackImage from '@/assets/images/placeholder.png'
 
 const auth = useAuth()
 const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
 const showExp = ref(false)
-
-const handleLoginClick = () => {
-  if (!auth.isLoggedIn.value) {
-    showLoginModal.value = true
-  }
-}
 
 const vietnamTime = ref('')
 const vietnamDate = ref('')
@@ -114,22 +111,15 @@ const activeIndex = ref(null)
 let timer = null
 let closeTimer = null
 
-const handleMouseEnter = (index) => {
-  clearTimeout(closeTimer) // 清除之前的关闭计时器
-  activeIndex.value = index
-}
+const menuItems = ref([]) // 动态菜单
+const fallbackImageUrl = new URL(fallbackImage, import.meta.url).href
 
-const handleMouseLeave = () => {
-  // 设置延迟关闭（例如 300ms）
-  closeTimer = setTimeout(() => {
-    activeIndex.value = null
-  }, 300)
-}
-
-const menuItems = [
+// 默认菜单结构（带子菜单）
+const defaultMenuItems = [
   {
     label: '主页',
     path: '/',
+    children: null,
   },
   {
     label: '爆炸罐',
@@ -199,32 +189,88 @@ const menuItems = [
   {
     label: '晋升',
     path: '/promotions',
+    children: null,
   },
   {
     label: '应用程序',
     path: '/downloadapp',
+    children: null,
   },
   {
     label: '代理',
     path: '/agents',
+    children: null,
   },
   {
     label: '客服服务 24/7',
     path: '/support',
+    children: null,
   },
 ]
 
-// 获取越南时间
+// 获取后端菜单
+const fetchMenuItems = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 18,
+        status: 1,
+      },
+    })
+
+    const backendData = response.data.success ? response.data.data : []
+
+    // 🧠 把后端数据转成 Map 方便匹配
+    const backendMap = new Map(backendData.map((item) => [item.game_name || item.name, item]))
+
+    // ✅ 按 defaultMenuItems 顺序构建最终菜单
+    menuItems.value = defaultMenuItems.map((defaultItem) => {
+      const backendItem = backendMap.get(defaultItem.label)
+
+      return {
+        label: defaultItem.label,
+        path: defaultItem.path,
+        children: defaultItem.children || null,
+        image_url:
+          backendItem && backendItem.image_url
+            ? `http://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+            : fallbackImageUrl,
+      }
+    })
+  } catch (error) {
+    console.error('❌ 获取菜单失败:', error)
+    // fallback
+    menuItems.value = defaultMenuItems.map((item) => ({
+      ...item,
+      image_url: fallbackImageUrl,
+    }))
+  }
+}
+
+// 登录逻辑
+const handleLoginClick = () => {
+  if (!auth.isLoggedIn.value) {
+    showLoginModal.value = true
+  }
+}
+
+// hover 切换导航
+const handleMouseEnter = (index) => {
+  clearTimeout(closeTimer)
+  activeIndex.value = index
+}
+
+const handleMouseLeave = () => {
+  closeTimer = setTimeout(() => {
+    activeIndex.value = null
+  }, 300)
+}
+
+// 越南时间
 const updateVietnamTime = () => {
   const now = new Date()
+  const options = { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }
 
-  // 越南时区 (UTC+7)
-  const options = {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    hour12: false,
-  }
-
-  // 时间格式: 14:30
   vietnamTime.value = now.toLocaleTimeString('vi-VN', {
     ...options,
     hour: '2-digit',
@@ -232,19 +278,18 @@ const updateVietnamTime = () => {
     second: '2-digit',
   })
 
-  // 新日期格式: yy/mm/dd (T3)
   const weekdayShort = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][now.getDay()]
-  const year = now.getFullYear().toString().slice(0)
-  const month = (now.getMonth() + 1).toString().padStart(2, '0')
-  const day = now.getDate().toString().padStart(2, '0')
-
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
   vietnamDate.value = `${year}/${month}/${day} (${weekdayShort})`
 }
 
+// 初始化
 onMounted(() => {
   updateVietnamTime()
-  // 每秒更新一次
   timer = setInterval(updateVietnamTime, 1000)
+  fetchMenuItems()
 })
 
 onBeforeUnmount(() => {
@@ -253,6 +298,27 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
+.main-header {
+  height: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+}
+
+.nav-icon {
+  height: 30px !important;
+  width: 30px !important;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: top;
+  border-radius: 9999px;
+}
+
+.nav-icon.active {
+  background-position: bottom;
+}
+
 .login-button,
 .register-button,
 .try-button {
@@ -342,10 +408,6 @@ onBeforeUnmount(() => {
   color: white;
   font-size: 14px;
   margin-left: 5px;
-}
-
-.main-header {
-  height: 72px;
 }
 
 .nav {

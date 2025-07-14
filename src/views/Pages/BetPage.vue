@@ -13,27 +13,23 @@
     <div class="betpage-container">
       <div class="betpage-wrapper">
         <el-row :gutter="20">
-          <el-col :span="8" v-for="(img, index) in 1" :key="index" class="image-box">
-            <div class="image-wrapper">
-              <p class="intro">SE 赌</p>
-              <img src="@/assets/images/bet1.png" class="betpage-img" />
-              <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
-            </div>
-          </el-col>
-
-          <el-col :span="8" v-for="(img, index) in 1" :key="index" class="image-box">
-            <div class="image-wrapper">
-              <p class="intro">SE 赌</p>
-              <img src="@/assets/images/bet1.png" class="betpage-img" />
-              <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
-            </div>
-          </el-col>
-
-          <el-col :span="8" v-for="(img, index) in 1" :key="index" class="image-box">
-            <div class="image-wrapper">
-              <p class="intro">SE 赌</p>
-              <img src="@/assets/images/bet1.png" class="betpage-img" />
-              <el-button class="img-button" type="primary" size="small">进入游戏</el-button>
+          <el-col :span="8" v-for="(game, index) in category9Games" :key="index" class="image-box">
+            <div class="image-wrapper" @click="navigateToGame(game.url)">
+              <p class="intro">{{ game.name }}</p>
+              <img
+                :src="game.image_url"
+                :alt="game.name"
+                class="betpage-img"
+                @error="(e) => (e.target.src = placeholderImage)"
+              />
+              <el-button
+                class="img-button"
+                type="primary"
+                size="small"
+                @click.stop="navigateToGame(game.url)"
+              >
+                进入游戏
+              </el-button>
             </div>
           </el-col>
         </el-row>
@@ -46,17 +42,50 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '../FooterMain.vue'
-// import { useRouter } from 'vue-router'
-// const router = useRouter()
+import axios from 'axios'
+import placeholderImage from '@/assets/images/placeholder.png'
 
-// function goToGame(index) {
-//   // 根据 index 跳转不同页面
-//   const paths = ['/casino/baccarat', '/casino/roulette', '/casino/blackjack']
-//   router.push(paths[index])
-// }
+const category9Games = ref([])
+
+const fetchCategory9Games = async () => {
+  try {
+    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: {
+        category: 9,
+        status: 1,
+      },
+    })
+
+    if (response.data.success) {
+      category9Games.value = response.data.data
+        .map((game) => ({
+          name: game.game_name || game.name,
+          image_url: game.image_url
+            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            : placeholderImage,
+          url: game.url || '#',
+        }))
+        .reverse()
+    }
+  } catch (error) {
+    console.error('Error fetching category 9 games:', error)
+    category9Games.value = []
+  }
+}
+
+const navigateToGame = (url) => {
+  if (url && url !== '#') {
+    window.location.href = url
+  }
+}
+
+onMounted(() => {
+  fetchCategory9Games()
+})
 </script>
 
 <style scoped>
@@ -119,7 +148,6 @@ import FooterMain from '../FooterMain.vue'
   border: solid 1px #ffd630;
 }
 
-/* 鼠标移入时按钮样式 */
 .image-wrapper:hover .img-button:hover {
   background-color: #ffd630;
   color: black;
