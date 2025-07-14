@@ -96,11 +96,11 @@ import RegisterModal from '@/views/components/RegisterModal.vue'
 import LoginModal from '@/views/components/LoginModal.vue'
 import ExpModal from '@/views/components/ExpModal.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useAuth } from '@/utils/auth'
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
 import fallbackImage from '@/assets/images/placeholder.png'
 
-const auth = useAuth()
+const auth = useAuthStore()
 const showLoginModal = ref(false)
 const showRegisterModal = ref(false)
 const showExp = ref(false)
@@ -203,7 +203,7 @@ const defaultMenuItems = [
   },
   {
     label: '客服服务 24/7',
-    path: '/support',
+    path: '/customer-service',
     children: null,
   },
 ]

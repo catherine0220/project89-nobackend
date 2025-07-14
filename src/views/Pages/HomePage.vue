@@ -4,8 +4,13 @@
     <!-- Banner -->
     <div class="banner w-full">
       <el-carousel trigger="click" height="450px">
-        <el-carousel-item v-for="(img, index) in bannerList" :key="index">
-          <img :src="img" alt="Banner" class="w-full h-full object-cover" />
+        <el-carousel-item
+          v-for="(banner, index) in bannerList"
+          :key="index"
+          class="cursor-pointer"
+          @click="router.push(banner.route)"
+        >
+          <img :src="banner.src" alt="Banner" class="w-full h-full object-cover" />
         </el-carousel-item>
       </el-carousel>
     </div>
@@ -197,11 +202,26 @@ const handleJackpotChange = (index) => {
 }
 
 const bannerList = [
-  new URL('@/assets/images/banner1.jpg', import.meta.url).href,
-  new URL('@/assets/images/banner2.jpg', import.meta.url).href,
-  new URL('@/assets/images/banner3.jpg', import.meta.url).href,
-  new URL('@/assets/images/banner4.jpg', import.meta.url).href,
-  new URL('@/assets/images/banner5.jpg', import.meta.url).href,
+  {
+    src: new URL('@/assets/images/banner1.jpg', import.meta.url).href,
+    route: '/promotions',
+  },
+  {
+    src: new URL('@/assets/images/banner2.jpg', import.meta.url).href,
+    route: '/promotions',
+  },
+  {
+    src: new URL('@/assets/images/banner3.jpg', import.meta.url).href,
+    route: '/promotions',
+  },
+  {
+    src: new URL('@/assets/images/banner4.jpg', import.meta.url).href,
+    route: '/promotions',
+  },
+  {
+    src: new URL('@/assets/images/banner5.jpg', import.meta.url).href,
+    route: '/membercenter',
+  },
 ]
 
 const typesItems = [

@@ -68,9 +68,12 @@ import { getCaptcha } from '@/utils/captcha'
 import { login } from '@/api/auth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useModalStore } from '@/stores/modal'
 
+const modalStore = useModalStore()
 const auth = useAuthStore()
 const emit = defineEmits(['close', 'login-success', 'show-register'])
+
 const router = useRouter()
 
 const formRef = ref()
@@ -125,7 +128,11 @@ const handleSubmit = async () => {
       auth.login(res.data, formData.password)
       emit('login-success', res.data)
       emit('close')
-      router.push('/home')
+
+      const modalStore = useModalStore()
+      const redirectTo = modalStore.afterLoginRedirect || '/home'
+      modalStore.clearRedirectPath()
+      router.push(redirectTo)
     } else {
       ElMessage.error(res.message || '登录失败')
       refreshCaptcha()
@@ -139,7 +146,14 @@ const handleSubmit = async () => {
   }
 }
 
-const handleClose = () => emit('close')
+const handleClose = () => {
+  emit('close')
+  if (modalStore.afterLoginRedirect) {
+    router.push('/') // 或你想跳的安全页面
+    modalStore.clearRedirectFlag()
+  }
+}
+
 const handleForgotPassword = () => ElMessage.info('忘记密码功能即将开放')
 const handleCustomerService = () => ElMessage.info('正在为您连接在线客服...')
 const switchToRegister = () => {

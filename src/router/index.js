@@ -23,6 +23,9 @@ import ReportView from '@/views/components/ReportView.vue'
 
 import LoginHome from '@/views/Pages/LoginHome.vue'
 import MemberCenter from '@/views/Pages/MemberCenter.vue'
+import CustomerService from '@/views/Pages/CustomerService.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useModalStore } from '@/stores/modal'
 
 const routes = [
   {
@@ -35,13 +38,28 @@ const routes = [
     path: '/home',
     name: 'LoginHome',
     component: LoginHome,
-    meta: { requiresAuth: true },
+    meta: {
+      title: '首页',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/customer-service',
+    name: 'CustomerService',
+    component: CustomerService,
+    meta: {
+      title: '客服',
+      requiresAuth: true,
+    },
   },
   {
     path: '/membercenter',
     name: 'MemberCenter',
     component: MemberCenter,
-    meta: { title: '会员中心' },
+    meta: {
+      title: '会员中心',
+      requiresAuth: true,
+    },
   },
   {
     path: '/sports',
@@ -71,13 +89,19 @@ const routes = [
     path: '/deposit',
     name: 'Deposit',
     component: DepositPage,
-    meta: { title: '存款帮助' },
+    meta: {
+      title: '存款帮助',
+      requiresAuth: true,
+    },
   },
   {
     path: '/withdrawal',
     name: 'Withdrawal',
     component: WithdrawalPage,
-    meta: { title: '取款帮助' },
+    meta: {
+      title: '取款帮助',
+      requiresAuth: true,
+    },
   },
   {
     path: '/contact',
@@ -165,6 +189,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  const modalStore = useModalStore()
+
   document.title = to.meta.title ? `${to.meta.title} - 89 Bet` : '89 Bet'
 
   if (to.meta.requiresRefresh) {
@@ -172,14 +199,19 @@ router.beforeEach((to, from, next) => {
     return
   }
 
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next(false)
+    modalStore.setRedirectPath(to.fullPath)
+    modalStore.openLoginModal()
+    return
+  }
+
   next()
 })
 
 router.afterEach((to, from) => {
-  // 确保滚动到顶部
   window.scrollTo(0, 0)
 
-  // 如果是从不同路由跳转过来，可以在这里重置页面状态
   if (to.path !== from.path) {
     // 这里可以添加任何需要重置的状态逻辑
     // 例如：关闭所有弹窗、重置表单等

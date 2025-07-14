@@ -184,8 +184,7 @@ const refreshBalance = async () => {
 const handleLogout = async () => {
   try {
     await auth.logout()
-    // 登出成功后跳转到登录页或首页
-    router.push('/') // 或 '/home' 根据你的需求
+    router.push('/')
   } catch (error) {
     console.error('Logout failed:', error)
   }
@@ -298,7 +297,7 @@ const defaultMenuItems = [
   },
   {
     label: '客服服务 24/7',
-    path: '/support',
+    path: '/customer-service',
     children: null,
   },
 ]
