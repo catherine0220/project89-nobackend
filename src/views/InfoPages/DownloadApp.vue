@@ -19,13 +19,13 @@
             应用程序以获得更好、更安全的游戏体验，该应用程序支持所有产品：体育、电子竞技、赌场、游戏和彩票。
           </p>
           <div class="qr-container flex flex-col lg:flex-row items-center">
-            <div class="qr1 flex flex-col justify-center items-center">
+            <div class="qr1 flex flex-col justify-center items-center mr-[20px]">
               <img src="@/assets/images/iosqr1.png" alt="QR" class="qr" />
               <button class="btn btn-outline-light mb-4 me-lg-3">
                 <i class="fab fa-android"></i>Andriod
               </button>
             </div>
-            <div class="qr1 flex flex-col justify-center items-center">
+            <div class="qr1 flex flex-col justify-center items-center mr-[20px]">
               <img src="@/assets/images/iosqr2.png" alt="QR" class="qr" />
               <button class="btn btn-outline-light mb-4 me-lg-3">
                 <i class="fab fa-apple"></i>IOS
@@ -66,6 +66,7 @@ import iosphone from '@/assets/images/iosphone.png'
   border: 1px solid #ffd630;
   border-radius: 19px;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .p {

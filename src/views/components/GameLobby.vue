@@ -1,4 +1,3 @@
-how?:
 <template>
   <div class="lobby-container">
     <div class="lobby-wrapper">
@@ -9,13 +8,13 @@ how?:
             :class="{ active: activeLobbyName === game.name }"
             @click="navigateToGame(game.path, index, game.name)"
           >
-            <!-- 加在这里！ -->
             <img
               class="lobby-image"
               :src="game.image_url"
               :alt="game.name"
               @error="(e) => (e.target.src = placeholderImage)"
             />
+
             <div class="lobby-title">{{ game.name }}</div>
           </div>
         </li>
@@ -25,19 +24,39 @@ how?:
     <div class="lobby-wrapper2">
       <div class="header flex justify-center">
         <div class="header-wrap">
-          <img src="@/assets/images/lobbylogo.png" alt="lobbylogo" class="lobbylogo" />
-          <div class="search">
-            <input type="text" placeholder="搜索游戏" class="search-input" />
-            <i class="fa-solid fa-search search-icon"></i>
+          <img :src="currentLogo" alt="lobbylogo" class="lobbylogo" @error="handleLogoError" />
+          <div
+            class="search"
+            :style="{
+              background: currentColors.searchBg,
+              color: currentColors.searchText,
+            }"
+          >
+            <input
+              type="text"
+              placeholder="搜索游戏"
+              class="search-input"
+              :style="{
+                background: currentColors.searchInputBg,
+                color: currentColors.searchInputText,
+              }"
+              v-model="currentSearchQuery"
+              @keyup.enter="searchGames"
+            />
+            <i
+              class="fa-solid fa-search search-icon"
+              :style="{ color: currentColors.searchText }"
+              @click="searchGames"
+            ></i>
           </div>
         </div>
       </div>
 
-      <!-- nav -->
-      <div class="game-categories">
+      <!-- 导航分类 -->
+      <div class="game-categories" :style="{ background: currentColors.categoryBg }">
         <ul class="category-list">
           <li
-            v-for="category in categories"
+            v-for="category in currentTabCategories"
             :key="category.id"
             class="category-item"
             :class="{ active: activeCategory === category.id }"
@@ -51,11 +70,24 @@ how?:
       </div>
 
       <div class="flex flex-col items-center justify-center" ref="wrapperRef">
-        <!-- 游戏介绍 -->
-        <div v-if="activeCategory === 1" class="flex flex-col items-center justify-center">
-          <h1 class="headline">
-            <span class="headline-title">游戏介绍</span>
-            <a :href="firstPlayUrl" target="_blank" class="more-games-button">
+        <!-- 游戏介绍轮播 -->
+        <div
+          v-if="activeCategory === 1 && currentTabGames.intro.length > 0"
+          class="flex flex-col items-center justify-center"
+        >
+          <h1 class="headline" :style="{ borderBottomColor: currentColors.borderColor }">
+            <span class="headline-title" :style="{ background: currentColors.titleBg }"
+              >游戏介绍</span
+            >
+            <a
+              :href="firstPlayUrl"
+              target="_blank"
+              class="more-games-button"
+              :style="{
+                backgroundColor: currentColors.moreButtonBg,
+                color: currentColors.moreButtonText,
+              }"
+            >
               <el-icon><CaretRight /></el-icon> 更多游戏
             </a>
           </h1>
@@ -76,7 +108,13 @@ how?:
                     :key="gameIndex"
                     class="game-carousel-container"
                   >
-                    <div class="game-card">
+                    <div
+                      class="game-card"
+                      :style="{
+                        '--hover-bg': currentColors.cardHoverBg,
+                        '--hover-text': currentColors.cardHoverText,
+                      }"
+                    >
                       <div class="game-header">
                         <div class="logo-container">
                           <img
@@ -86,7 +124,16 @@ how?:
                             @error="(e) => (e.target.src = placeholderImage)"
                           />
                           <div class="logo-overlay"></div>
-                          <a class="play-button" :href="game.url">PLAY</a>
+                          <a
+                            class="play-button"
+                            :href="game.url"
+                            :style="{
+                              background: currentColors.playButtonBg,
+                              color: currentColors.playButtonText,
+                            }"
+                          >
+                            PLAY
+                          </a>
                         </div>
                         <div class="game-title-container">
                           <h3 class="game-title">{{ game.name }}</h3>
@@ -116,17 +163,40 @@ how?:
           </div>
         </div>
 
-        <!-- 热门游戏 -->
-        <h1 class="headline" v-if="activeCategory === 1">
-          <span class="headline-title">热门游戏</span>
-          <a :href="firstPlayUrl" target="_blank" class="more-games-button">
+        <!-- 热门游戏标题 -->
+        <h1
+          class="headline"
+          v-if="activeCategory === 1"
+          :style="{ borderBottomColor: currentColors.borderColor }"
+        >
+          <span class="headline-title" :style="{ background: currentColors.titleBg }"
+            >热门游戏</span
+          >
+          <a
+            :href="firstPlayUrl"
+            target="_blank"
+            class="more-games-button"
+            :style="{
+              backgroundColor: currentColors.moreButtonBg,
+              color: currentColors.moreButtonText,
+            }"
+          >
             <el-icon><CaretRight /></el-icon> 更多游戏
           </a>
         </h1>
 
+        <!-- 游戏网格 -->
         <div class="game-grid-container">
           <div class="game-grid">
-            <div v-for="(game, gameIndex) in visibleHotGames" :key="gameIndex" class="game-card2">
+            <div
+              v-for="(game, gameIndex) in paginatedGames"
+              :key="gameIndex"
+              class="game-card2"
+              :style="{
+                '--hover-bg': currentColors.cardHoverBg,
+                '--hover-text': currentColors.cardHoverText,
+              }"
+            >
               <div class="game-header">
                 <div class="logo-container">
                   <img
@@ -136,44 +206,53 @@ how?:
                     @error="(e) => (e.target.src = placeholderImage)"
                   />
                   <div class="logo-overlay"></div>
-                  <a class="play-button" :href="game.url">PLAY</a>
+                  <a
+                    class="play-button"
+                    :href="game.url"
+                    :style="{
+                      background: currentColors.playButtonBg,
+                      color: currentColors.playButtonText,
+                    }"
+                  >
+                    PLAY
+                  </a>
                 </div>
                 <div class="game-title-container">
                   <h3 class="game-title2">{{ game.name }}</h3>
-                  <i class="heart-icon fa-regular fa-heart"></i>
+                  <i
+                    class="heart-icon"
+                    :class="game.isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"
+                    @click="toggleFavorite(game)"
+                  ></i>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Custom pagination controls -->
-          <div class="hot-games-pagination">
+          <!-- 分页控件 -->
+          <div class="hot-games-pagination" v-if="totalPages > 1">
             <button
               class="pagination-btn first"
               @click="goToFirstPage"
-              :disabled="currentHotPage === 1"
+              :disabled="currentPage === 1"
             >
               <i class="fa-solid fa-backward-step"></i>
             </button>
-            <button
-              class="pagination-btn prev"
-              @click="prevHotPage"
-              :disabled="currentHotPage === 1"
-            >
+            <button class="pagination-btn prev" @click="prevPage" :disabled="currentPage === 1">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <div class="page-indicator">{{ currentHotPage }}/{{ totalHotPages }}</div>
+            <div class="page-indicator">{{ currentPage }}/{{ totalPages }}</div>
             <button
               class="pagination-btn next"
-              @click="nextHotPage"
-              :disabled="currentHotPage === totalHotPages"
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
             >
               <i class="fa-solid fa-chevron-right"></i>
             </button>
             <button
               class="pagination-btn last"
               @click="goToLastPage"
-              :disabled="currentHotPage === totalHotPages"
+              :disabled="currentPage === totalPages"
             >
               <i class="fa-solid fa-forward-step"></i>
             </button>
@@ -189,153 +268,181 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { CaretRight } from '@element-plus/icons-vue'
 import { ElLoading } from 'element-plus'
 import placeholderImage from '@/assets/images/placeholder.png'
+import defaultLogo from '@/assets/images/lobbylogo.png'
 import axios from 'axios'
 
-const category19Games = ref([])
-const category7Games = ref([])
-const category8Games = ref([])
-
+// 基本数据
+const category19Games = ref([]) // 用于tab logo
+const category26Games = ref([]) // 新增：用于header logo
 const activeLobbyName = ref('Pg电子')
 const wrapperRef = ref(null)
+const currentSearchQuery = ref('')
 
-const firstPlayUrl = computed(() => {
-  return category7Games.value.length > 0 ? category7Games.value[0].url : '#'
+// Logo 计算属性
+const currentLogo = computed(() => {
+  const game = category26Games.value.find((g) => g.name.includes(activeLobbyName.value))
+  return game?.image_url || defaultLogo
 })
 
-// 🟡 后端 category ID 对应配置
-const categories = ref([
-  { id: 1, name: '最热游戏', backend: [8, 9] },
-  { id: 2, name: '所有游戏', backend: [21] },
-  { id: 3, name: '最新游戏', backend: [22] },
-  { id: 4, name: '电子游戏', backend: [23] },
-  { id: 5, name: '其他游戏', backend: [24] },
-])
-
-const activeCategory = ref(1)
-const showGameIntro = ref(true)
-
-const fetchCategory19Games = async () => {
-  try {
-    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
-      params: { category: 19, status: 1 },
-    })
-
-    if (res.data.success) {
-      const games = res.data.data
-        .map((game) => ({
-          name: game.game_name || game.name,
-          image_url: game.image_url
-            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-            : placeholderImage,
-          path: game.path || '#',
-        }))
-        .reverse()
-
-      category19Games.value = games
-      const pg = games.find((g) => g.name.includes('Pg电子'))
-      activeLobbyName.value = pg ? pg.name : games[0]?.name || 'Pg电子'
-    }
-  } catch (err) {
-    console.error('加载 category 19 失败', err)
-  }
+// 图片加载错误处理
+const handleLogoError = (e) => {
+  e.target.src = placeholderImage
 }
 
-const fetchGamesByCategory = async (categoryId) => {
+// 获取category26数据（header logo）
+const fetchCategory25Games = async () => {
   try {
     const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
-      params: { category: categoryId, status: 1 },
+      params: { category: 25, status: 1 },
     })
 
     if (res.data.success) {
-      return res.data.data.map((game) => ({
+      category26Games.value = res.data.data.map((game) => ({
         name: game.game_name || game.name,
         image_url: game.image_url
           ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
           : placeholderImage,
-        description: game.description || '暂无描述',
-        path: game.path || '#',
-        url: game.url
-          ? `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
-          : '#',
       }))
     }
   } catch (err) {
-    console.error(`加载 category ${categoryId} 失败`, err)
+    console.error('加载 category 26 失败', err)
   }
-  return []
 }
 
-const selectCategory = async (id) => {
-  activeCategory.value = id
-  showGameIntro.value = id === 1
+// 当前标签页数据
+const activeLobbyTab = ref(0)
+const lobbyTabs = ref([
+  {
+    id: 0,
+    name: 'Pg电子',
+    colors: {
+      categoryBg: '#1a1a1a',
+      titleBg: '#1a1a1a',
+      borderColor: '#1a1a1a',
+      activeColor: '#ff1c4f',
+      moreButtonBg: '#fff',
+      moreButtonText: '#000',
+      searchBg: '#000',
+      searchText: '#fff',
+      searchInputBg: '#fff',
+      searchInputText: '#000',
+      playButtonBg: '#ff1c4f',
+      playButtonText: '#fff',
+      cardHoverBg: '#ff1c4f',
+      cardHoverText: '#fff',
+    },
+    categories: [
+      { id: 1, name: '最热游戏', backend: [7, 8] },
+      { id: 2, name: '所有游戏', backend: [21] },
+      { id: 3, name: '最新游戏', backend: [22] },
+      { id: 4, name: '电子游戏', backend: [23] },
+      { id: 5, name: '其他游戏', backend: [24] },
+    ],
+    intro: [],
+    hot: [],
+    all: [],
+  },
+  {
+    id: 1,
+    name: '吉利电子',
+    colors: {
+      categoryBg: 'linear-gradient(to bottom, #fff468 0%, #f3b720 33%, #eaa000 66%)',
+      titleBg: '#f3b720',
+      borderColor: '#f3b720',
+      activeColor: '#642801',
+      moreButtonBg: '#fff',
+      moreButtonText: '#f3b720',
+      searchBg: 'linear-gradient(to bottom, #fff468 0%, #f3b720 33%, #eaa000 66%)',
+      searchText: '#fff',
+      searchInputBg: '#fff',
+      searchInputText: '#000',
+      playButtonBg: 'linear-gradient(to bottom, #fff468 0%, #f3b720 33%, #eaa000 66%)',
+      playButtonText: '#fff',
+      cardHoverBg: '#f3b720',
+      cardHoverText: '#fff',
+    },
+    categories: [
+      { id: 1, name: '最热游戏', backend: [27, 26] },
+      { id: 2, name: '所有游戏', backend: [21] },
+      { id: 3, name: '最新游戏', backend: [22] },
+      { id: 4, name: '电子游戏', backend: [23] },
+      { id: 5, name: '其他游戏', backend: [24] },
+    ],
+    intro: [],
+    hot: [],
+    all: [],
+  },
+])
 
-  let loading = null
-  if (wrapperRef.value) {
-    loading = ElLoading.service({
-      target: wrapperRef.value,
-      text: '加载中...',
-      background: 'rgba(255,255,255,0.8)',
-    })
-  }
-
-  try {
-    const selected = categories.value.find((cat) => cat.id === id)
-    if (!selected) return
-
-    if (id === 1) {
-      const list7 = await fetchGamesByCategory(7)
-      const list8 = await fetchGamesByCategory(8)
-      category7Games.value = list7
-      category8Games.value = list8
-    } else {
-      let results = []
-      for (const realId of selected.backend) {
-        const list = await fetchGamesByCategory(realId)
-        results.push(...list)
-      }
-      category8Games.value = results
+watch(
+  activeLobbyTab,
+  (newTabId) => {
+    const currentTab = lobbyTabs.value.find((tab) => tab.id === newTabId)
+    if (currentTab?.colors?.activeColor) {
+      document.documentElement.style.setProperty('--active-color', currentTab.colors.activeColor)
     }
-  } catch (err) {
-    console.error('分类加载失败', err)
-  } finally {
-    loading?.close()
-  }
-}
+  },
+  { immediate: true },
+) // 立即执行一次
 
-// ➤ 点击游戏进入
-const navigateToGame = (path, index, name) => {
-  activeLobbyName.value = name
-  if (path && path !== '#') {
-    window.location.href = path
-  }
-}
-
-// 热门游戏分页
-const currentHotPage = ref(1)
-const gamesPerPage = 10
-const totalHotPages = computed(() => Math.ceil(category8Games.value.length / gamesPerPage))
-const visibleHotGames = computed(() => {
-  const start = (currentHotPage.value - 1) * gamesPerPage
-  return category8Games.value.slice(start, start + gamesPerPage)
+// 获取当前颜色方案
+const currentColors = computed(() => {
+  return (
+    lobbyTabs.value[activeLobbyTab.value]?.colors || {
+      categoryBg: '#1a1a1a',
+      titleBg: '#ff1c4f',
+      borderColor: '#ff1c4f',
+      playButtonBg: '#ff1c4f',
+      playButtonText: '#fff',
+      cardHoverBg: '#ff1c4f',
+      cardHoverText: '#fff',
+    }
+  )
 })
-const nextHotPage = () => currentHotPage.value++
-const prevHotPage = () => currentHotPage.value--
-const goToFirstPage = () => (currentHotPage.value = 1)
-const goToLastPage = () => (currentHotPage.value = totalHotPages.value)
 
-// 游戏介绍轮播图
+// 当前活动数据
+const activeCategory = ref(1)
+const currentTabCategories = computed(() => lobbyTabs.value[activeLobbyTab.value].categories)
+const currentTabGames = computed(() => lobbyTabs.value[activeLobbyTab.value])
+const firstPlayUrl = computed(() => {
+  return currentTabGames.value.intro.length > 0 ? currentTabGames.value.intro[0].url : '#'
+})
+
+// 分页相关
+const currentPage = ref(1)
+const gamesPerPage = computed(() => {
+  return activeCategory.value === 1 ? 10 : 15
+})
+
+const totalPages = computed(() => Math.ceil(filteredGames.value.length / gamesPerPage.value))
+const paginatedGames = computed(() => {
+  const start = (currentPage.value - 1) * gamesPerPage.value
+  return filteredGames.value.slice(start, start + gamesPerPage.value)
+})
+
+// 搜索过滤
+const filteredGames = computed(() => {
+  if (!currentSearchQuery.value) {
+    return activeCategory.value === 1 ? currentTabGames.value.hot : currentTabGames.value.all
+  }
+  const query = currentSearchQuery.value.toLowerCase()
+  return (
+    activeCategory.value === 1 ? currentTabGames.value.hot : currentTabGames.value.all
+  ).filter((game) => game.name.toLowerCase().includes(query))
+})
+
+// 轮播图相关
 const gameGroups = ref([])
 const currentIndex = ref(0)
 let autoPlayInterval = null
 
 const initGroups = () => {
   const groups = []
-  for (let i = 0; i < category7Games.value.length; i += 5) {
-    groups.push(category7Games.value.slice(i, i + 5))
+  for (let i = 0; i < currentTabGames.value.intro.length; i += 5) {
+    groups.push(currentTabGames.value.intro.slice(i, i + 5))
   }
   gameGroups.value = groups
 }
-watch(category7Games, initGroups)
 
 const nextSlide = () => {
   if (gameGroups.value.length > 0) {
@@ -374,17 +481,169 @@ const resetAutoPlay = () => {
   startAutoPlay()
 }
 
+// 分页控制
+const nextPage = () => currentPage.value++
+const prevPage = () => currentPage.value--
+const goToFirstPage = () => (currentPage.value = 1)
+const goToLastPage = () => (currentPage.value = totalPages.value)
+
+// 搜索功能
+const searchGames = () => {
+  currentPage.value = 1
+}
+
+// 收藏功能
+const toggleFavorite = (game) => {
+  game.isFavorite = !game.isFavorite
+}
+
+// 获取游戏数据
+const fetchGamesByCategory = async (categoryId) => {
+  try {
+    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: { category: categoryId, status: 1 },
+    })
+
+    if (res.data.success) {
+      return res.data.data.map((game) => ({
+        ...game,
+        name: game.game_name || game.name,
+        image_url: game.image_url
+          ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+          : placeholderImage,
+        description: game.description || '暂无描述',
+        path: game.path || '#',
+        url: game.url
+          ? `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+          : '#',
+        isFavorite: false,
+      }))
+    }
+  } catch (err) {
+    console.error(`加载 category ${categoryId} 失败`, err)
+  }
+  return []
+}
+
+// 加载标签页数据
+const loadLobbyTabData = async (index) => {
+  const loading = ElLoading.service({
+    target: wrapperRef.value,
+    text: '加载中...',
+    background: 'rgba(255,255,255,0.8)',
+  })
+
+  try {
+    const tab = lobbyTabs.value[index]
+    if (!tab) return
+
+    currentPage.value = 1
+    currentSearchQuery.value = ''
+    activeCategory.value = 1
+
+    if (tab.categories[0].backend[0]) {
+      const introGames = await fetchGamesByCategory(tab.categories[0].backend[0])
+      lobbyTabs.value[index].intro = introGames
+    }
+    if (tab.categories[0].backend[1]) {
+      const hotGames = await fetchGamesByCategory(tab.categories[0].backend[1])
+      lobbyTabs.value[index].hot = hotGames
+    }
+    initGroups()
+  } catch (err) {
+    console.error('加载标签页数据失败', err)
+  } finally {
+    loading.close()
+  }
+}
+
+// 选择分类
+const selectCategory = async (id) => {
+  activeCategory.value = id
+  currentPage.value = 1
+
+  const loading = ElLoading.service({
+    target: wrapperRef.value,
+    text: '加载中...',
+    background: 'rgba(255,255,255,0.8)',
+  })
+
+  try {
+    const category = currentTabCategories.value.find((c) => c.id === id)
+    if (!category) return
+    if (id === 1) return
+
+    let results = []
+    for (const realId of category.backend) {
+      const list = await fetchGamesByCategory(realId)
+      results.push(...list)
+    }
+    lobbyTabs.value[activeLobbyTab.value].all = results
+  } catch (err) {
+    console.error('分类加载失败', err)
+  } finally {
+    loading.close()
+  }
+}
+
+// 点击 lobby-card 导航
+const navigateToGame = (path, index, name) => {
+  console.log('点击了', name)
+  activeLobbyName.value = name
+  activeLobbyTab.value = index
+  loadLobbyTabData(index)
+
+  if (path && path !== '#') {
+    window.location.href = path
+  }
+}
+
+// 初始化加载
+const fetchCategory19Games = async () => {
+  try {
+    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: { category: 19, status: 1 },
+    })
+
+    if (res.data.success) {
+      const games = res.data.data
+        .map((game) => ({
+          name: game.game_name || game.name,
+          image_url: game.image_url
+            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            : placeholderImage,
+          path: game.path || '#',
+        }))
+        .reverse()
+
+      category19Games.value = games
+      const pg = games.find((g) => g.name.includes('Pg电子'))
+      activeLobbyName.value = pg ? pg.name : games[0]?.name || 'Pg电子'
+    }
+  } catch (err) {
+    console.error('加载 category 19 失败', err)
+  }
+}
+
+// 生命周期钩子
 onMounted(() => {
   fetchCategory19Games()
-  selectCategory(1)
+  fetchCategory25Games()
+  loadLobbyTabData(0)
   startAutoPlay()
 })
 onUnmounted(() => stopAutoPlay())
+
+// 监听变化
+watch(() => currentTabGames.value.intro, initGroups)
+watch(() => activeLobbyTab.value, loadLobbyTabData)
 </script>
+
+<!-- 样式部分保持不变 -->
 
 <style scoped>
 .more-games-button {
-  color: #000;
+  /* color: #000; */
   font-size: 15px;
   line-height: 30px;
   text-decoration: none;
@@ -396,7 +655,7 @@ onUnmounted(() => stopAutoPlay())
   height: 30px;
   border-bottom-width: 2px;
   border-bottom-style: solid;
-  border-bottom-color: #000;
+  /* border-bottom-color: #000; */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -409,7 +668,7 @@ onUnmounted(() => stopAutoPlay())
   color: #fff;
   font-size: 15px;
   line-height: 30px;
-  background: #000;
+  /* background: #000; */
   border-radius: 8px 8px 0 0;
 }
 
@@ -491,10 +750,14 @@ onUnmounted(() => stopAutoPlay())
   width: 150px !important;
 }
 
-.game-card:hover,
+.game-card:hover {
+  background-color: var(--hover-bg) !important;
+  color: var(--hover-text) !important;
+}
+
 .game-card2:hover {
-  color: #fff;
-  background-color: #ff1c4f;
+  background-color: var(--hover-bg) !important;
+  color: var(--hover-text) !important;
 }
 
 /* Logo容器样式 */
@@ -535,8 +798,8 @@ onUnmounted(() => stopAutoPlay())
   height: 30px;
   width: 100px;
   transform: translate(-50%, -50%);
-  background-color: #ff1c4f;
-  color: #fff;
+  /* background-color: #ff1c4f;
+  color: #fff; */
   border: none;
   border-radius: 5px;
   font-size: 14px;
@@ -576,7 +839,7 @@ onUnmounted(() => stopAutoPlay())
   padding: 10px 5px 10px;
   margin: auto;
   width: 145px;
-  height: 55px;
+  height: 45px;
 }
 
 .heart-icon {
@@ -721,7 +984,7 @@ onUnmounted(() => stopAutoPlay())
 
 /* search */
 .search-icon {
-  color: white;
+  /* color: white; */
   font-size: 20px;
   cursor: pointer;
 }
@@ -731,7 +994,7 @@ onUnmounted(() => stopAutoPlay())
   height: 40px;
   display: flex;
   align-items: center;
-  background: #000;
+  /* background: #000; */
   border-radius: 3px;
   padding: 5px;
   box-sizing: border-box;
@@ -741,8 +1004,8 @@ onUnmounted(() => stopAutoPlay())
   width: 150px;
   height: 100%;
   font-size: 14px;
-  color: #000;
-  background: #fff;
+  /* color: #000;
+  background: #fff; */
   border: none;
   outline: none;
   padding: 0;
@@ -840,7 +1103,7 @@ onUnmounted(() => stopAutoPlay())
 .game-categories {
   margin-bottom: 15px;
   min-height: 50px;
-  background: #000;
+  /* background: #000; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -879,8 +1142,12 @@ onUnmounted(() => stopAutoPlay())
 }
 
 /* 当前选中项样式 */
-.category-item.active .category-link {
-  background: #ff1c4f;
+:root {
+  --active-color: #ff1c4f; /* 默认值 */
+}
+
+.category-list .category-item.active .category-link {
+  background: var(--active-color) !important;
   border-radius: 15px;
 }
 
