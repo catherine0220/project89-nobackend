@@ -180,6 +180,7 @@ const handleClose = () => {
   background-position: center;
   background-size: contain;
   cursor: pointer;
+  z-index: 10;
 }
 
 .el-icon {
@@ -265,8 +266,8 @@ const handleClose = () => {
 }
 
 .nav-icon {
-  width: 70px;
-  height: 70px;
+  width: 70px !important;
+  height: 70px !important;
   z-index: 2;
   position: relative;
 }

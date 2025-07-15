@@ -98,14 +98,26 @@
               @mouseenter="activeIndex = index"
               @mouseleave="activeIndex = null"
             >
-              <router-link
-                v-for="(child, childIndex) in item.children"
-                :key="childIndex"
-                :to="child.path"
-                class="login-dropdown-link no-underline"
-              >
-                {{ child.label }}
-              </router-link>
+              <div class="dropdown-columns">
+                <div
+                  class="dropdown-column"
+                  v-for="(group, groupIndex) in chunkChildren(item.children, 10)"
+                  :key="groupIndex"
+                >
+                  <router-link
+                    v-for="(child, childIndex) in group"
+                    :key="childIndex"
+                    :to="child.path"
+                    class="login-dropdown-link no-underline flex items-center gap-2"
+                  >
+                    <div
+                      class="w-5 h-5 bg-cover bg-center"
+                      :style="{ backgroundImage: `url(${child.image_url})` }"
+                    ></div>
+                    {{ child.label }}
+                  </router-link>
+                </div>
+              </div>
             </div>
           </div>
         </el-col>
@@ -305,35 +317,54 @@ const defaultMenuItems = [
 // 获取后端菜单
 const fetchMenuItems = async () => {
   try {
-    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
-      params: {
-        category: 18,
-        status: 1,
-      },
+    // 获取主菜单(category 18)
+    const mainResponse = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: { category: 18, status: 1 },
     })
 
-    const backendData = response.data.success ? response.data.data : []
+    // 专门获取爆炸罐游戏(category 19)
+    const explosiveResponse = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      params: { category: 19, status: 1 },
+    })
 
-    // 🧠 把后端数据转成 Map 方便匹配
+    const backendData = mainResponse.data.success ? mainResponse.data.data : []
+    const explosiveGames = explosiveResponse.data.success ? explosiveResponse.data.data : []
+
     const backendMap = new Map(backendData.map((item) => [item.game_name || item.name, item]))
 
-    // ✅ 按 defaultMenuItems 顺序构建最终菜单
     menuItems.value = defaultMenuItems.map((defaultItem) => {
       const backendItem = backendMap.get(defaultItem.label)
 
-      return {
-        label: defaultItem.label,
-        path: defaultItem.path,
-        children: defaultItem.children || null,
-        image_url:
-          backendItem && backendItem.image_url
+      // 特殊处理爆炸罐菜单
+      if (defaultItem.label === '爆炸罐') {
+        return {
+          label: defaultItem.label,
+          path: defaultItem.path,
+          children: explosiveGames.map((game) => ({
+            label: game.game_name || game.name,
+            url: game.url
+              ? `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+              : '#',
+            image_url: game.image_url
+              ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+              : fallbackImageUrl,
+          })),
+          image_url: backendItem?.image_url
             ? `http://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
             : fallbackImageUrl,
+        }
+      }
+
+      // 其他菜单项处理保持不变
+      return {
+        ...defaultItem,
+        image_url: backendItem?.image_url
+          ? `http://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+          : fallbackImageUrl,
       }
     })
   } catch (error) {
-    console.error('❌ 获取菜单失败:', error)
-    // fallback
+    console.error('获取菜单失败:', error)
     menuItems.value = defaultMenuItems.map((item) => ({
       ...item,
       image_url: fallbackImageUrl,
@@ -366,6 +397,14 @@ const updateVietnamTime = () => {
   const day = now.getDate().toString().padStart(2, '0')
 
   vietnamDate.value = `${year}/${month}/${day} (${weekdayShort})`
+}
+
+function chunkChildren(array, size) {
+  const result = []
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size))
+  }
+  return result
 }
 
 onMounted(() => {
@@ -598,16 +637,29 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100%;
   background-color: rgba(30, 30, 30, 0.9);
   border-radius: 5px;
   z-index: 50;
-  min-width: 100px;
-  min-height: 150px;
+  min-height: 100px;
   margin-top: 10px;
   border: 1px solid #ffd630;
+  padding: 10px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  width: max-content;
+}
+
+.dropdown-columns {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.dropdown-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
 }
 
 .login-dropdown-link {
