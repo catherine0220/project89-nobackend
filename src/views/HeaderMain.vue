@@ -236,12 +236,12 @@ const defaultMenuItems = [
 const fetchMenuItems = async () => {
   try {
     // 获取主菜单(category 18)
-    const mainResponse = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const mainResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: { category: 18, status: 1 },
     })
 
     // 专门获取爆炸罐游戏(category 19)
-    const explosiveResponse = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const explosiveResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: { category: 19, status: 1 },
     })
 
@@ -261,14 +261,14 @@ const fetchMenuItems = async () => {
           children: explosiveGames.map((game) => ({
             label: game.game_name || game.name,
             url: game.url
-              ? `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+              ? `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
               : '#',
             image_url: game.image_url
-              ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+              ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
               : fallbackImageUrl,
           })),
           image_url: backendItem?.image_url
-            ? `http://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+            ? `https://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
             : fallbackImageUrl,
         }
       }
@@ -277,7 +277,7 @@ const fetchMenuItems = async () => {
       return {
         ...defaultItem,
         image_url: backendItem?.image_url
-          ? `http://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+          ? `https://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
           : fallbackImageUrl,
       }
     })

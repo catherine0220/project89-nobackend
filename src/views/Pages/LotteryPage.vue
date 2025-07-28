@@ -54,7 +54,7 @@ const category1Games = ref([])
 // Fetch category 1 games
 const fetchCategory1Games = async () => {
   try {
-    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const response = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: {
         category: 1,
         status: 1,
@@ -66,7 +66,7 @@ const fetchCategory1Games = async () => {
         .map((game) => ({
           name: game.game_name || game.name,
           image_url: game.image_url
-            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
             : placeholderImage,
           url: game.url || '#',
         }))

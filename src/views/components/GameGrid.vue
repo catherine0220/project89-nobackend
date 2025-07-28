@@ -118,7 +118,7 @@ const bgStyle = {
 const fetchData = async () => {
   try {
     // 1. First fetch tab data from category 10
-    const tabResponse = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const tabResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: {
         category: 10,
         status: 1,
@@ -133,7 +133,7 @@ const fetchData = async () => {
       tabList.value = rawTabs.map((tab) => ({
         name: tab.game_name || tab.name || '未知标签',
         icon_url: tab.image_url
-          ? `http://192.168.0.122${tab.image_url.startsWith('/') ? '' : '/'}${tab.image_url}`
+          ? `https://192.168.0.122${tab.image_url.startsWith('/') ? '' : '/'}${tab.image_url}`
           : fallbackImageUrl,
       }))
     }
@@ -141,7 +141,7 @@ const fetchData = async () => {
     // 2. Then fetch games for each tab (categories 11+)
     const gameCategories = Array.from({ length: tabList.value.length }, (_, i) => 11 + i)
     const gameRequests = gameCategories.map((category) =>
-      axios.get('http://192.168.0.122/silver/user/game_list.php', {
+      axios.get('https://192.168.0.122/silver/user/game_list.php', {
         params: {
           category,
           status: 1,
@@ -157,13 +157,13 @@ const fetchData = async () => {
         return response.data.data.map((game) => ({
           ...game,
           image_url: game.image_url
-            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
             : fallbackImageUrl,
           game_name: game.game_name || game.name || '未知游戏',
           // url: (function (a) {
           //   console.log(a)
           // })([game.url, game.game_name]),
-          url: `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`,
+          url: `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`,
         }))
       }
       return []

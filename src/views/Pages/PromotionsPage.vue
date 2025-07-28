@@ -51,7 +51,7 @@ const category3Promotions = ref([])
 // Fetch category 3 promotions
 const fetchCategory3Promotions = async () => {
   try {
-    const response = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const response = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: {
         category: 3,
         status: 1,
@@ -62,7 +62,7 @@ const fetchCategory3Promotions = async () => {
       category3Promotions.value = response.data.data
         .map((promo) => ({
           image_url: promo.image_url
-            ? `http://192.168.0.122${promo.image_url.startsWith('/') ? '' : '/'}${promo.image_url}`
+            ? `https://192.168.0.122${promo.image_url.startsWith('/') ? '' : '/'}${promo.image_url}`
             : placeholderImage,
           url: promo.url || '#',
         }))

@@ -292,7 +292,7 @@ const handleLogoError = (e) => {
 // 获取category26数据（header logo）
 const fetchCategory25Games = async () => {
   try {
-    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: { category: 25, status: 1 },
     })
 
@@ -300,7 +300,7 @@ const fetchCategory25Games = async () => {
       category26Games.value = res.data.data.map((game) => ({
         name: game.game_name || game.name,
         image_url: game.image_url
-          ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+          ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
           : placeholderImage,
       }))
     }
@@ -500,7 +500,7 @@ const toggleFavorite = (game) => {
 // 获取游戏数据
 const fetchGamesByCategory = async (categoryId) => {
   try {
-    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: { category: categoryId, status: 1 },
     })
 
@@ -509,12 +509,12 @@ const fetchGamesByCategory = async (categoryId) => {
         ...game,
         name: game.game_name || game.name,
         image_url: game.image_url
-          ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+          ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
           : placeholderImage,
         description: game.description || '暂无描述',
         path: game.path || '#',
         url: game.url
-          ? `http://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+          ? `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
           : '#',
         isFavorite: false,
       }))
@@ -601,7 +601,7 @@ const navigateToGame = (path, index, name) => {
 // 初始化加载
 const fetchCategory19Games = async () => {
   try {
-    const res = await axios.get('http://192.168.0.122/silver/user/game_list.php', {
+    const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
       params: { category: 19, status: 1 },
     })
 
@@ -610,7 +610,7 @@ const fetchCategory19Games = async () => {
         .map((game) => ({
           name: game.game_name || game.name,
           image_url: game.image_url
-            ? `http://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+            ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
             : placeholderImage,
           path: game.path || '#',
         }))
