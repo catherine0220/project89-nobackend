@@ -89,6 +89,573 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+import RegisterModal from '@/views/components/RegisterModal.vue'
+import LoginModal from '@/views/components/LoginModal.vue'
+import bgImg from '@/assets/images/gamegrid/slotgamebg.jpg'
+
+// // 图片路径工具函数
+// function localImg(path) {
+//   return new URL(`@/assets/images/${path}`, import.meta.url).href
+// }
+
+// 弹窗 & hover 控制
+const showLoginModal = ref(false)
+const showRegisterModal = ref(false)
+const hoveredIndex = ref(null)
+
+// 当前 Tab 索引
+const activeTab = ref(0)
+const gamesPerGroup = 14
+
+// 背景图样式
+const bgStyle = {
+  backgroundImage: `url(${bgImg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  width: '1900px',
+  color: 'white',
+}
+
+// 🧨 tab 和游戏本地静态数据（可改成你自己的图）
+const tabList = ref([
+  {
+    name: '电子城',
+    icon_url: new URL('@/assets/images/gamegrid/slot1.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '麻将路2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '麻将唐',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '决定性胜负',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: 'm麻将路',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '黄金城4',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '玛雅黄金城2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '玛雅黄金城3',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '阿次特克',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '财富降临',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '福星',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '富贵财神',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运舞狮7',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '黄金城5',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid13.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '龙神寻宝2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid14.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+  {
+    name: 'FC 电子',
+    icon_url: new URL('@/assets/images/gamegrid/slot2.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '夜市',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '农历新年',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '精灵灯',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '新年快乐2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-4.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '夜市2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '印加女王',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '糖暴击',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '古墓宝藏',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '丰厚财富 3x3',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '新年多多',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运财富',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '金豹',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '印加神话',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-13.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '魔法配对',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid2-14.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+  {
+    name: 'PG 电子',
+    icon_url: new URL('@/assets/images/gamegrid/slot3.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '麻将路',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '阿兹特克',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '麻将路2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '战斗奖励',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-4.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运猫',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '狂野盗贼',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '独角兽小贴士',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运兔',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '醉酒女王',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '战胜财神',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '象头神',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '狂野烟花',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '澳门梦',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-13.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运龙',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid3-14.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+  {
+    name: 'CQ9 电子',
+    icon_url: new URL('@/assets/images/gamegrid/slot4.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '好命运',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: 'Disco 夜晚',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '赚钱摇钱树',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '发财神2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-4.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '跳高2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '跳高',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '移动跳高',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '阿拉丁与神灯',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '飞起来',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '5 吉祥物',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '好命运',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '迪斯科之夜',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '雷神',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-13.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '火女王2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid4-14.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+  {
+    name: 'JL 电子',
+    icon_url: new URL('@/assets/images/gamegrid/slot5.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '超级王牌',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '黄金帝国',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运宝石',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '拳击王',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-4.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运宝石2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '无限王牌',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '疯狂 777',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '抢手疯了',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运宝石3',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '阿里巴巴',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运豹',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '超级王牌豪华房',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '3个野马币',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-13.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '硬币树',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid5-14.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+  {
+    name: 'KA 电子',
+    icon_url: new URL('@/assets/images/gamegrid/slot6.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '宝罐',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '疯狂奖励',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '超级能量',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运 88',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-4.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '金水牛',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '金虎财富',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '财富与财富',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运财富',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '高级版疯狂奖励',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '超级火焰',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '幸运之神',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '超级龙虎',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '四海龙王',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-13.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '僵尸道人',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid6-14.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+  {
+    name: 'BNG 电子',
+    icon_url: new URL('@/assets/images/gamegrid/slot7.png', import.meta.url).href,
+    games: [
+      {
+        game_name: '森林王',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-1.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '寻找黄金',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-2.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '黑狼',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-3.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '大盗',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-5.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '阿慈特火焰',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-6.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '太阳神庙3',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-7.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '太阳女神',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-8.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '浪漫莲花',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-9.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '毒苹果',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-10.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '快乐鱼',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-11.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '黄金特快车',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-12.png', import.meta.url).href,
+        url: '#',
+      },
+      {
+        game_name: '采珠者2',
+        image_url: new URL('@/assets/images/gamegrid/gamegrid7-13.png', import.meta.url).href,
+        url: '#',
+      },
+    ],
+  },
+])
+
+// 当前选中 Tab 对应的游戏
+const filteredGames = computed(() => {
+  if (!tabList.value[activeTab.value]) return []
+  return tabList.value[activeTab.value].games.slice(0, gamesPerGroup)
+})
+
+// 模拟跳转登录（你原本逻辑保留）
+const goToLogin = () => {
+  showLoginModal.value = true
+}
+</script>
+
+<!-- <script setup>
 import { ref, computed, onMounted } from 'vue'
 import RegisterModal from '@/views/components/RegisterModal.vue'
 import bgImg from '@/assets/images/gamegrid/slotgamebg.jpg'
@@ -183,7 +750,7 @@ const filteredGames = computed(() => {
 onMounted(() => {
   fetchData()
 })
-</script>
+</script> -->
 
 <style scoped>
 .indicator {

@@ -46,36 +46,37 @@ import { ref, onMounted } from 'vue'
 import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '../FooterMain.vue'
-import axios from 'axios'
+// import axios from 'axios'
 import placeholderImage from '@/assets/images/placeholder.png'
+import { category9Games as staticGames } from '@/data/betpage.js'
 
 const category9Games = ref([])
 
-const fetchCategory9Games = async () => {
-  try {
-    const response = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: {
-        category: 9,
-        status: 1,
-      },
-    })
+// const fetchCategory9Games = async () => {
+//   try {
+//     const response = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: {
+//         category: 9,
+//         status: 1,
+//       },
+//     })
 
-    if (response.data.success) {
-      category9Games.value = response.data.data
-        .map((game) => ({
-          name: game.game_name || game.name,
-          image_url: game.image_url
-            ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-            : placeholderImage,
-          url: game.url || '#',
-        }))
-        .reverse()
-    }
-  } catch (error) {
-    console.error('Error fetching category 9 games:', error)
-    category9Games.value = []
-  }
-}
+//     if (response.data.success) {
+//       category9Games.value = response.data.data
+//         .map((game) => ({
+//           name: game.game_name || game.name,
+//           image_url: game.image_url
+//             ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+//             : placeholderImage,
+//           url: game.url || '#',
+//         }))
+//         .reverse()
+//     }
+//   } catch (error) {
+//     console.error('Error fetching category 9 games:', error)
+//     category9Games.value = []
+//   }
+// }
 
 const navigateToGame = (url) => {
   if (url && url !== '#') {
@@ -84,7 +85,8 @@ const navigateToGame = (url) => {
 }
 
 onMounted(() => {
-  fetchCategory9Games()
+  // fetchCategory9Games()
+  category9Games.value = staticGames
 })
 </script>
 

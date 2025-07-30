@@ -2,7 +2,8 @@
   <div class="lobby-container">
     <div class="lobby-wrapper">
       <ul class="lobby-list">
-        <li v-for="(game, index) in category19Games" :key="index" class="lobby-item">
+        <!-- <li v-for="(game, index) in category19Games" :key="index" class="lobby-item"> -->
+        <li v-for="(game, index) in gamesbrand" :key="index" class="lobby-item">
           <div
             class="lobby-card"
             :class="{ active: activeLobbyName === game.name }"
@@ -269,19 +270,32 @@ import { CaretRight } from '@element-plus/icons-vue'
 import { ElLoading } from 'element-plus'
 import placeholderImage from '@/assets/images/placeholder.png'
 import defaultLogo from '@/assets/images/lobbylogo.png'
-import axios from 'axios'
+// import axios from 'axios'
+import staticgamesbrand from '@/data/gamesbrand.js'
+import staticgamesheader from '@/data/gameslobbyheader.js'
+import { mockGamesData } from '@/data/mocklobbygames.js'
 
 // 基本数据
-const category19Games = ref([]) // 用于tab logo
-const category26Games = ref([]) // 新增：用于header logo
+// const category19Games = ref([]) // 用于tab logo
+const gamesbrand = ref([])
+const category25Games = ref([]) // 新增：用于header logo
 const activeLobbyName = ref('Pg电子')
 const wrapperRef = ref(null)
 const currentSearchQuery = ref('')
 
 // Logo 计算属性
+// const currentLogo = computed(() => {
+//   const game = category25Games.value.find((g) => g.name.includes(activeLobbyName.value))
+//   return game?.image_url || defaultLogo
+// })
+
 const currentLogo = computed(() => {
-  const game = category26Games.value.find((g) => g.name.includes(activeLobbyName.value))
-  return game?.image_url || defaultLogo
+  // 从 category25Games 中找到与当前活动品牌名称匹配的项
+  const matchedGame = category25Games.value.find(
+    (game) => game.name.replace(/\s+/g, '') === activeLobbyName.value.replace(/\s+/g, ''),
+  )
+
+  return matchedGame?.image_url || defaultLogo
 })
 
 // 图片加载错误处理
@@ -289,24 +303,28 @@ const handleLogoError = (e) => {
   e.target.src = placeholderImage
 }
 
-// 获取category26数据（header logo）
-const fetchCategory25Games = async () => {
-  try {
-    const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: { category: 25, status: 1 },
-    })
+// 获取数据（header logo）
+// const fetchCategory25Games = async () => {
+//   try {
+//     const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: { category: 25, status: 1 },
+//     })
 
-    if (res.data.success) {
-      category26Games.value = res.data.data.map((game) => ({
-        name: game.game_name || game.name,
-        image_url: game.image_url
-          ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-          : placeholderImage,
-      }))
-    }
-  } catch (err) {
-    console.error('加载 category 26 失败', err)
-  }
+//     if (res.data.success) {
+//       category25Games.value = res.data.data.map((game) => ({
+//         name: game.game_name || game.name,
+//         image_url: game.image_url
+//           ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+//           : placeholderImage,
+//       }))
+//     }
+//   } catch (err) {
+//     console.error('加载 category 26 失败', err)
+//   }
+// }
+
+const fetchCategory25Games = async () => {
+  category25Games.value = staticgamesheader
 }
 
 // 当前标签页数据
@@ -331,12 +349,19 @@ const lobbyTabs = ref([
       cardHoverBg: '#ff1c4f',
       cardHoverText: '#fff',
     },
+    // categories: [
+    //   { id: 1, name: '最热游戏', backend: [7, 8] },
+    //   { id: 2, name: '所有游戏', backend: [21] },
+    //   { id: 3, name: '最新游戏', backend: [22] },
+    //   { id: 4, name: '电子游戏', backend: [23] },
+    //   { id: 5, name: '其他游戏', backend: [24] },
+    // ],
     categories: [
-      { id: 1, name: '最热游戏', backend: [7, 8] },
-      { id: 2, name: '所有游戏', backend: [21] },
-      { id: 3, name: '最新游戏', backend: [22] },
-      { id: 4, name: '电子游戏', backend: [23] },
-      { id: 5, name: '其他游戏', backend: [24] },
+      { id: 1, name: '最热游戏', backend: [1, 2] },
+      { id: 2, name: '所有游戏', backend: [3] },
+      { id: 3, name: '最新游戏', backend: [4] },
+      { id: 4, name: '电子游戏', backend: [5] },
+      { id: 5, name: '其他游戏', backend: [6] },
     ],
     intro: [],
     hot: [],
@@ -362,11 +387,11 @@ const lobbyTabs = ref([
       cardHoverText: '#fff',
     },
     categories: [
-      { id: 1, name: '最热游戏', backend: [27, 26] },
-      { id: 2, name: '所有游戏', backend: [21] },
-      { id: 3, name: '最新游戏', backend: [22] },
-      { id: 4, name: '电子游戏', backend: [23] },
-      { id: 5, name: '其他游戏', backend: [24] },
+      { id: 1, name: '最热游戏', backend: [1, 7] },
+      { id: 2, name: '所有游戏', backend: [3] },
+      { id: 3, name: '最新游戏', backend: [4] },
+      { id: 4, name: '电子游戏', backend: [5] },
+      { id: 5, name: '其他游戏', backend: [6] },
     ],
     intro: [],
     hot: [],
@@ -498,31 +523,46 @@ const toggleFavorite = (game) => {
 }
 
 // 获取游戏数据
-const fetchGamesByCategory = async (categoryId) => {
-  try {
-    const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: { category: categoryId, status: 1 },
-    })
+// const fetchGamesByCategory = async (categoryId) => {
+//   try {
+//     const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: { category: categoryId, status: 1 },
+//     })
 
-    if (res.data.success) {
-      return res.data.data.map((game) => ({
-        ...game,
-        name: game.game_name || game.name,
-        image_url: game.image_url
-          ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-          : placeholderImage,
-        description: game.description || '暂无描述',
-        path: game.path || '#',
-        url: game.url
-          ? `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
-          : '#',
-        isFavorite: false,
-      }))
-    }
-  } catch (err) {
-    console.error(`加载 category ${categoryId} 失败`, err)
-  }
-  return []
+//     if (res.data.success) {
+//       return res.data.data.map((game) => ({
+//         ...game,
+//         name: game.game_name || game.name,
+//         image_url: game.image_url
+//           ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+//           : placeholderImage,
+//         description: game.description || '暂无描述',
+//         path: game.path || '#',
+//         url: game.url
+//           ? `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+//           : '#',
+//         isFavorite: false,
+//       }))
+//     }
+//   } catch (err) {
+//     console.error(`加载 category ${categoryId} 失败`, err)
+//   }
+//   return []
+// }
+
+const fetchGamesByCategory = async (categoryId) => {
+  // Use the imported mock data
+  const games = mockGamesData[categoryId] || []
+
+  return games.map((game) => ({
+    ...game,
+    name: game.game_name || game.name,
+    image_url: game.image_url || placeholderImage,
+    description: game.description || '暂无描述',
+    path: game.path || '#',
+    url: game.url || '#',
+    isFavorite: false,
+  }))
 }
 
 // 加载标签页数据
@@ -587,9 +627,20 @@ const selectCategory = async (id) => {
 }
 
 // 点击 lobby-card 导航
+// const navigateToGame = (path, index, name) => {
+//   console.log('点击了', name)
+//   activeLobbyName.value = name
+//   activeLobbyTab.value = index
+//   loadLobbyTabData(index)
+
+//   if (path && path !== '#') {
+//     window.location.href = path
+//   }
+// }
+
 const navigateToGame = (path, index, name) => {
-  console.log('点击了', name)
-  activeLobbyName.value = name
+  // 移除名称中的空格以确保匹配
+  activeLobbyName.value = name.replace(/\s+/g, '')
   activeLobbyTab.value = index
   loadLobbyTabData(index)
 
@@ -599,35 +650,40 @@ const navigateToGame = (path, index, name) => {
 }
 
 // 初始化加载
-const fetchCategory19Games = async () => {
-  try {
-    const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: { category: 19, status: 1 },
-    })
+// const fetchCategory19Games = async () => {
+//   try {
+//     const res = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: { category: 19, status: 1 },
+//     })
 
-    if (res.data.success) {
-      const games = res.data.data
-        .map((game) => ({
-          name: game.game_name || game.name,
-          image_url: game.image_url
-            ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-            : placeholderImage,
-          path: game.path || '#',
-        }))
-        .reverse()
+//     if (res.data.success) {
+//       const games = res.data.data
+//         .map((game) => ({
+//           name: game.game_name || game.name,
+//           image_url: game.image_url
+//             ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+//             : placeholderImage,
+//           path: game.path || '#',
+//         }))
+//         .reverse()
 
-      category19Games.value = games
-      const pg = games.find((g) => g.name.includes('Pg电子'))
-      activeLobbyName.value = pg ? pg.name : games[0]?.name || 'Pg电子'
-    }
-  } catch (err) {
-    console.error('加载 category 19 失败', err)
-  }
+//       category19Games.value = games
+//       const pg = games.find((g) => g.name.includes('Pg电子'))
+//       activeLobbyName.value = pg ? pg.name : games[0]?.name || 'Pg电子'
+//     }
+//   } catch (err) {
+//     console.error('加载 category 19 失败', err)
+//   }
+// }
+const fetchGamesBrand = () => {
+  gamesbrand.value = staticgamesbrand
+  const pg = staticgamesbrand.find((g) => g.name.includes('Pg电子'))
+  activeLobbyName.value = pg ? pg.name : staticgamesbrand[0]?.name || 'Pg电子'
 }
 
 // 生命周期钩子
 onMounted(() => {
-  fetchCategory19Games()
+  fetchGamesBrand()
   fetchCategory25Games()
   loadLobbyTabData(0)
   startAutoPlay()
