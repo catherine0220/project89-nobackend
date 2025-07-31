@@ -111,7 +111,7 @@
                     class="login-dropdown-link no-underline flex items-center gap-2"
                   >
                     <div
-                      class="w-5 h-5 bg-cover bg-center"
+                      class="w-5 h-2 bg-cover bg-center"
                       :style="{ backgroundImage: `url(${child.image_url})` }"
                     ></div>
                     {{ child.label }}
