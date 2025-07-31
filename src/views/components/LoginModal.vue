@@ -65,7 +65,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { CloseBold } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getCaptcha } from '@/utils/captcha'
-import { login } from '@/api/auth'
+// import { login } from '@/api/auth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useModalStore } from '@/stores/modal'
@@ -106,40 +106,72 @@ const refreshCaptcha = async () => {
   }
 }
 
+// const handleSubmit = async () => {
+//   try {
+//     loading.value = true
+
+//     // 首先验证表单
+//     await formRef.value.validate()
+
+//     // 验证验证码
+//     if (formData.captcha.toLowerCase() !== captchaText.value.toLowerCase()) {
+//       throw new Error('验证码错误')
+//     }
+
+//     const res = await login({
+//       username: formData.username,
+//       password: formData.password,
+//     })
+
+//     if (res.success) {
+//       auth.login(res.data, formData.password)
+//       emit('login-success', res.data)
+//       emit('close')
+
+//       const modalStore = useModalStore()
+//       const redirectTo = modalStore.redirectPath || '/home'
+//       modalStore.clearRedirectPath()
+//       router.push(redirectTo)
+//     } else {
+//       ElMessage.error(res.message || '登录失败')
+//       refreshCaptcha()
+//     }
+//   } catch (error) {
+//     console.error('Login error:', error)
+//     ElMessage.error(error.message || '请检查登录信息是否正确')
+//     refreshCaptcha()
+//   } finally {
+//     loading.value = false
+//   }
+// }
+
 const handleSubmit = async () => {
   try {
     loading.value = true
 
-    // 首先验证表单
-    await formRef.value.validate()
-
-    // 验证验证码
-    if (formData.captcha.toLowerCase() !== captchaText.value.toLowerCase()) {
-      throw new Error('验证码错误')
+    // 前端模拟验证（跳过实际API请求）
+    if (!formData.username || !formData.password) {
+      throw new Error('请输入用户名和密码')
     }
 
-    const res = await login({
+    // 模拟登录成功
+    const mockUser = {
+      id: 1,
       username: formData.username,
-      password: formData.password,
-    })
-
-    if (res.success) {
-      auth.login(res.data, formData.password)
-      emit('login-success', res.data)
-      emit('close')
-
-      const modalStore = useModalStore()
-      const redirectTo = modalStore.redirectPath || '/home'
-      modalStore.clearRedirectPath()
-      router.push(redirectTo)
-    } else {
-      ElMessage.error(res.message || '登录失败')
-      refreshCaptcha()
+      token: 'mock-token-' + Math.random().toString(36).slice(2),
     }
+
+    // 存储模拟用户数据
+    auth.login(mockUser, formData.password)
+    emit('login-success', mockUser)
+    emit('close')
+
+    // 跳转到目标页面
+    const redirectTo = modalStore.redirectPath || '/home'
+    modalStore.clearRedirectPath()
+    router.push(redirectTo)
   } catch (error) {
-    console.error('Login error:', error)
-    ElMessage.error(error.message || '请检查登录信息是否正确')
-    refreshCaptcha()
+    ElMessage.error(error.message || '登录失败')
   } finally {
     loading.value = false
   }

@@ -137,7 +137,7 @@ import { ElMessage } from 'element-plus'
 import axios from 'axios'
 import fallbackImage from '@/assets/images/placeholder.png'
 
-const menuItems = ref([])
+// const menuItems = ref([])
 const fallbackImageUrl = new URL(fallbackImage, import.meta.url).href
 const router = useRouter()
 
@@ -221,160 +221,274 @@ const handleMouseLeave = () => {
   }, 300)
 }
 
-const defaultMenuItems = [
+const menuItems = [
   {
     label: '主页',
+    image_url: new URL('@/assets/images/nav1.png', import.meta.url).href,
     path: '/',
     children: null,
   },
   {
     label: '爆炸罐',
+    image_url: new URL('@/assets/images/nav2.png', import.meta.url).href,
     path: '/explosivegame',
     children: [
-      { label: '经典模式', path: '/bomb/classic' },
-      { label: '快速模式', path: '/bomb/quick' },
-      { label: '团队模式', path: '/bomb/team' },
+      {
+        label: 'PG 电子',
+        path: '/explosivegame/game1',
+        image_url: new URL('@/assets/images/lobby/1.png', import.meta.url).href,
+      },
+      {
+        label: 'JL 电子',
+        path: '/explosivegame/game2',
+        image_url: new URL('@/assets/images/lobby/2.png', import.meta.url).href,
+      },
+      {
+        label: 'YB 电子',
+        path: '/explosivegame/game2',
+        image_url: new URL('@/assets/images/lobby/3.png', import.meta.url).href,
+      },
+      {
+        label: 'TP 电子',
+        path: '/explosivegame/game2',
+        image_url: new URL('@/assets/images/lobby/4.png', import.meta.url).href,
+      },
+      {
+        label: 'YGR 电子',
+        path: '/explosivegame/game2',
+        image_url: new URL('@/assets/images/lobby/5.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '捕鱼',
+    image_url: new URL('@/assets/images/nav3.png', import.meta.url).href,
     path: '/fishing',
     children: [
-      { label: '深海捕鱼', path: '/fishing/deepsea' },
-      { label: '黄金渔场', path: '/fishing/golden' },
-      { label: '多人竞技', path: '/fishing/multiplayer' },
+      {
+        label: 'JL 捕鱼',
+        path: '/fishing/deepsea',
+        image_url: new URL('@/assets/images/lobby/2.png', import.meta.url).href,
+      },
+      {
+        label: 'TP 渔场',
+        path: '/fishing/golden',
+        image_url: new URL('@/assets/images/lobby/4.png', import.meta.url).href,
+      },
+      {
+        label: 'CQ9 钓鱼',
+        path: '/fishing/multiplayer',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '赌场',
+    image_url: new URL('@/assets/images/nav4.png', import.meta.url).href,
     path: '/bet',
     children: [
-      { label: '百家乐', path: '/casino/baccarat' },
-      { label: '轮盘', path: '/casino/roulette' },
-      { label: '二十一点', path: '/casino/blackjack' },
-      { label: '德州扑克', path: '/casino/poker' },
+      {
+        label: '百家乐',
+        path: '/casino/baccarat',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '轮盘',
+        path: '/casino/roulette',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '二十一点',
+        path: '/casino/blackjack',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '德州扑克',
+        path: '/casino/poker',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '3D 纸牌游戏',
+    image_url: new URL('@/assets/images/nav5.png', import.meta.url).href,
     path: '/board',
     children: [
-      { label: '3D 扑克', path: '/cards/poker' },
-      { label: '3D 麻将', path: '/cards/mahjong' },
-      { label: '3D 老虎机', path: '/cards/slot' },
+      {
+        label: '3D 扑克',
+        path: '/cards/poker',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '3D 麻将',
+        path: '/cards/mahjong',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '3D 老虎机',
+        path: '/cards/slot',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '运动',
+    image_url: new URL('@/assets/images/nav6.png', import.meta.url).href,
     path: '/sports',
     children: [
-      { label: '足球', path: '/sports/football' },
-      { label: '篮球', path: '/sports/basketball' },
-      { label: '网球', path: '/sports/tennis' },
-      { label: '赛马', path: '/sports/horse' },
+      {
+        label: '足球',
+        path: '/sports/football',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '篮球',
+        path: '/sports/basketball',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '网球',
+        path: '/sports/tennis',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '赛马',
+        path: '/sports/horse',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '抽奖',
+    image_url: new URL('@/assets/images/nav7.png', import.meta.url).href,
     path: '/lottery',
     children: [
-      { label: '每日抽奖', path: '/lottery/daily' },
-      { label: '幸运大转盘', path: '/lottery/wheel' },
-      { label: 'VIP专属', path: '/lottery/vip' },
+      {
+        label: '每日抽奖',
+        path: '/lottery/daily',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: '幸运大转盘',
+        path: '/lottery/wheel',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: 'VIP专属',
+        path: '/lottery/vip',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '鸡踢',
+    image_url: new URL('@/assets/images/nav8.png', import.meta.url).href,
     path: '/cockfighting',
     children: [
-      { label: 'GT赛车', path: '/gt/race' },
-      { label: 'GT竞猜', path: '/gt/bet' },
-      { label: 'GT排行榜', path: '/gt/rank' },
+      {
+        label: 'GT赛车',
+        path: '/gt/race',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: 'GT竞猜',
+        path: '/gt/bet',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
+      {
+        label: 'GT排行榜',
+        path: '/gt/rank',
+        image_url: new URL('@/assets/images/lobby/11.png', import.meta.url).href,
+      },
     ],
   },
   {
     label: '晋升',
+    image_url: new URL('@/assets/images/nav9.png', import.meta.url).href,
     path: '/promotions',
     children: null,
   },
   {
     label: '应用程序',
+    image_url: new URL('@/assets/images/nav10.png', import.meta.url).href,
     path: '/downloadapp',
     children: null,
   },
   {
     label: '代理',
+    image_url: new URL('@/assets/images/nav11.png', import.meta.url).href,
     path: '/agents',
     children: null,
   },
   {
     label: '客服服务 24/7',
+    image_url: new URL('@/assets/images/nav12.png', import.meta.url).href,
     path: '/customer-service',
     children: null,
   },
 ]
 
 // 获取后端菜单
-const fetchMenuItems = async () => {
-  try {
-    // 获取主菜单(category 18)
-    const mainResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: { category: 18, status: 1 },
-    })
+// const fetchMenuItems = async () => {
+//   try {
+//     // 获取主菜单(category 18)
+//     const mainResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: { category: 18, status: 1 },
+//     })
 
-    // 专门获取爆炸罐游戏(category 19)
-    const explosiveResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: { category: 19, status: 1 },
-    })
+//     // 专门获取爆炸罐游戏(category 19)
+//     const explosiveResponse = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: { category: 19, status: 1 },
+//     })
 
-    const backendData = mainResponse.data.success ? mainResponse.data.data : []
-    const explosiveGames = explosiveResponse.data.success ? explosiveResponse.data.data : []
+//     const backendData = mainResponse.data.success ? mainResponse.data.data : []
+//     const explosiveGames = explosiveResponse.data.success ? explosiveResponse.data.data : []
 
-    const backendMap = new Map(backendData.map((item) => [item.game_name || item.name, item]))
+//     const backendMap = new Map(backendData.map((item) => [item.game_name || item.name, item]))
 
-    menuItems.value = defaultMenuItems.map((defaultItem) => {
-      const backendItem = backendMap.get(defaultItem.label)
+//     menuItems.value = defaultMenuItems.map((defaultItem) => {
+//       const backendItem = backendMap.get(defaultItem.label)
 
-      // 特殊处理爆炸罐菜单
-      if (defaultItem.label === '爆炸罐') {
-        return {
-          label: defaultItem.label,
-          path: defaultItem.path,
-          children: explosiveGames.map((game) => ({
-            label: game.game_name || game.name,
-            url: game.url
-              ? `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
-              : '#',
-            image_url: game.image_url
-              ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
-              : fallbackImageUrl,
-          })),
-          image_url: backendItem?.image_url
-            ? `https://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
-            : fallbackImageUrl,
-        }
-      }
+//       // 特殊处理爆炸罐菜单
+//       if (defaultItem.label === '爆炸罐') {
+//         return {
+//           label: defaultItem.label,
+//           path: defaultItem.path,
+//           children: explosiveGames.map((game) => ({
+//             label: game.game_name || game.name,
+//             url: game.url
+//               ? `https://192.168.0.122${game.url.startsWith('/') ? '' : '/'}${game.url}`
+//               : '#',
+//             image_url: game.image_url
+//               ? `https://192.168.0.122${game.image_url.startsWith('/') ? '' : '/'}${game.image_url}`
+//               : fallbackImageUrl,
+//           })),
+//           image_url: backendItem?.image_url
+//             ? `https://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+//             : fallbackImageUrl,
+//         }
+//       }
 
-      // 其他菜单项处理保持不变
-      return {
-        ...defaultItem,
-        image_url: backendItem?.image_url
-          ? `https://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
-          : fallbackImageUrl,
-      }
-    })
-  } catch (error) {
-    console.error('获取菜单失败:', error)
-    menuItems.value = defaultMenuItems.map((item) => ({
-      ...item,
-      image_url: fallbackImageUrl,
-    }))
-  }
-}
+//       // 其他菜单项处理保持不变
+//       return {
+//         ...defaultItem,
+//         image_url: backendItem?.image_url
+//           ? `https://192.168.0.122${backendItem.image_url.startsWith('/') ? '' : '/'}${backendItem.image_url}`
+//           : fallbackImageUrl,
+//       }
+//     })
+//   } catch (error) {
+//     console.error('获取菜单失败:', error)
+//     menuItems.value = defaultMenuItems.map((item) => ({
+//       ...item,
+//       image_url: fallbackImageUrl,
+//     }))
+//   }
+// }
 
-onMounted(() => {
-  fetchMenuItems()
-})
+// onMounted(() => {
+//   fetchMenuItems()
+// })
 
 const updateVietnamTime = () => {
   const now = new Date()

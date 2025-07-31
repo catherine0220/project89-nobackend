@@ -43,36 +43,37 @@ import { ref, onMounted } from 'vue'
 import DynamicHeader from '@/views/DynamicHeader.vue'
 import ABar from '@/views/ABar.vue'
 import FooterMain from '@/views/FooterMain.vue'
-import axios from 'axios'
+// import axios from 'axios'
 import placeholderImage from '@/assets/images/placeholder.png'
+import { category3Promotions as staticGames } from '@/data/promotionpage.js'
 
 const category3Promotions = ref([])
 
 // Fetch category 3 promotions
-const fetchCategory3Promotions = async () => {
-  try {
-    const response = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
-      params: {
-        category: 3,
-        status: 1,
-      },
-    })
+// const fetchCategory3Promotions = async () => {
+//   try {
+//     const response = await axios.get('https://192.168.0.122/silver/user/game_list.php', {
+//       params: {
+//         category: 3,
+//         status: 1,
+//       },
+//     })
 
-    if (response.data.success) {
-      category3Promotions.value = response.data.data
-        .map((promo) => ({
-          image_url: promo.image_url
-            ? `https://192.168.0.122${promo.image_url.startsWith('/') ? '' : '/'}${promo.image_url}`
-            : placeholderImage,
-          url: promo.url || '#',
-        }))
-        .reverse()
-    }
-  } catch (error) {
-    console.error('Error fetching category 3 promotions:', error)
-    category3Promotions.value = []
-  }
-}
+//     if (response.data.success) {
+//       category3Promotions.value = response.data.data
+//         .map((promo) => ({
+//           image_url: promo.image_url
+//             ? `https://192.168.0.122${promo.image_url.startsWith('/') ? '' : '/'}${promo.image_url}`
+//             : placeholderImage,
+//           url: promo.url || '#',
+//         }))
+//         .reverse()
+//     }
+//   } catch (error) {
+//     console.error('Error fetching category 3 promotions:', error)
+//     category3Promotions.value = []
+//   }
+// }
 
 const navigateToPromo = (url) => {
   if (url && url !== '#') {
@@ -81,7 +82,8 @@ const navigateToPromo = (url) => {
 }
 
 onMounted(() => {
-  fetchCategory3Promotions()
+  // fetchCategory3Promotions()
+  category3Promotions.value = staticGames
 })
 </script>
 
